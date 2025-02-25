@@ -26,6 +26,7 @@ if (NOT ${PROJECT_IS_TOP_LEVEL} )
 endif ()
 
 add_subdirectory ( "${PROJECT_SOURCE_DIR}/lib" )
+add_library ( fsm::fsm-lib ALIAS fsm-lib )
 
 if ( ${BUILD_TESTS} )
 	enable_testing()

@@ -1,3 +1,7 @@
+fsm-cpp v2.1.1 changelog:
+ - Release can now be included into your CMakeLists through `find_package`
+ - Added alias `fsm::fsm-lib`, you should use that for linking
+
 fsm-cpp v2.1.0 changelog:
  - Added `fsm::ActionConcept` and `fsm::ConditionConcept` that are used to harden the `fsm::Builder` API
  - Added duration to logs

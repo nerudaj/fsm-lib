@@ -6,7 +6,7 @@ include ( FetchContent )
 
 FetchContent_Declare ( LIBFSM_GIT
 	GIT_REPOSITORY "https://github.com/nerudaj/fsm-lib"
-	GIT_TAG "origin/main"
+	GIT_TAG "origin/${GIT_BRANCH}"
 )
 
 FetchContent_MakeAvailable ( LIBFSM_GIT )
@@ -15,4 +15,4 @@ project ( test-cpm )
 
 add_executable ( ${PROJECT_NAME} Main.cpp )
 
-target_link_libraries ( ${PROJECT_NAME} fsm-lib )
+target_link_libraries ( ${PROJECT_NAME} fsm::fsm-lib )

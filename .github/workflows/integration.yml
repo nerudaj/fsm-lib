@@ -18,6 +18,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Get branch names.
+      id: branch-names
+      uses: tj-actions/branch-names@v8
+
+    - name: Get Latest Release
+      id: release
+      uses: pozetroninc/github-action-get-latest-release@v0.8.0
+      with:
+        repository: ${{ github.repository }}
+
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v2
       with:
@@ -28,7 +38,7 @@ jobs:
       run: |
         mkdir _build
         cd _build
-        cmake ..
+        cmake -D GIT_BRANCH=${{ steps.branch-names.outputs.current_branch }} -D LATEST_TAG=${{ steps.release.outputs.release }} ..
       shell: cmd
 
     - name: Build
