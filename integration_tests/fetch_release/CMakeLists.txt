@@ -15,7 +15,7 @@ FetchContent_MakeAvailable ( LIBFSM )
 # CMAKE_COMPATIBLE_VERSION doesn't have 'v' prefix, nor -rcN suffixes, just N.N.N
 string ( REGEX MATCH "[0-9]+\.[0-9]+\.[0-9]+" CMAKE_COMPATIBLE_VERSION "${LATEST_TAG}" )
 
-find_package ( fsm ${CMAKE_COMPATIBLE_VERSION} REQUIRED PATHS "${libfsm_SOURCE_DIR}/lib/cmake" )
+find_package ( fsm-lib ${CMAKE_COMPATIBLE_VERSION} REQUIRED PATHS "${libfsm_SOURCE_DIR}/lib/cmake" )
 
 project ( test-cpm )
 
