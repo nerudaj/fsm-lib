@@ -12,7 +12,7 @@ endif ()
 
 set_cpp23_x64()
 
-get_git_version (
+get_version_from_git (
 	PROJECT_VERSION_VARIABLE GIT_PROJECT_VERSION
 	FULL_VERSION_VARIABLE FULL_PROJECT_VERSION
 )
