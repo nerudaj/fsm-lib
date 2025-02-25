@@ -6,13 +6,16 @@ set ( CMAKE_CXX_STANDARD 23 )
 include ( FetchContent )
 
 FetchContent_Declare ( LIBFSM
-	URL "https://github.com/nerudaj/fsm-lib/releases/download/${LATEST_TAG}/fsm-lib-${LATEST_TAG}-Windows-MSVC-x64.zip"
+	URL "https://github.com/nerudaj/fsm-lib/releases/download/${LATEST_TAG}/fsm-lib-${LATEST_TAG}-Windows-x64-MSVC-143.zip"
 	DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 
 FetchContent_MakeAvailable ( LIBFSM )
 
-find_package ( fsm ${LATEST_TAG} REQUIRED PATHS "${libfsm_SOURCE_DIR}/lib/cmake" )
+# CMAKE_COMPATIBLE_VERSION doesn't have 'v' prefix, nor -rcN suffixes, just N.N.N
+string ( REGEX MATCH "[0-9]+\.[0-9]+\.[0-9]+" CMAKE_COMPATIBLE_VERSION "${LATEST_TAG}" )
+
+find_package ( fsm ${CMAKE_COMPATIBLE_VERSION} REQUIRED PATHS "${libfsm_SOURCE_DIR}/lib/cmake" )
 
 project ( test-cpm )
 
