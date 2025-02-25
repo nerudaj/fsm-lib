@@ -27,27 +27,33 @@ jobs:
     - name: Check cmake version
       run: cmake --version
 
-    - name: Configure CMake
+    - name: Build Debug
       run: |
-        mkdir "${{env.BUILD_DIR}}"
-        cd "${{env.BUILD_DIR}}"
+        mkdir "${{github.workspace}}/Debug"
+        cd "${{github.workspace}}/Debug"
         cmake .. -D BUILD_TESTS=OFF BUILD_EXAMPLES=OFF
-      shell: cmd
-
-    - name: Build
-      working-directory: ${{env.BUILD_DIR}}
-      run: |
         cmake --build . --config Debug
+        cpack -C Debug
+    
+    - name: Build Release
+      run: |
+        mkdir "${{github.workspace}}/Release"
+        cd "${{github.workspace}}/Release"
+        cmake .. -D BUILD_TESTS=OFF BUILD_EXAMPLES=OFF
         cmake --build . --config Release
-      shell: cmd
+        cpack -C Release
 
-    - name: Pack
-      working-directory: ${{env.BUILD_DIR}}
-      run: cpack
-      
+    - name: Merge archives
+      run: |
+        $tempDir = "${{github.workspace}}/Staging"
+        New-Item -ItemType Directory -Path $tempDir -Force
+        Expand-Archive -Path ${{github.workspace}}/Debug/*.zip -DestinationPath $tempDir -Force
+        Expand-Archive -Path ${{github.workspace}}/Release/*.zip -DestinationPath $tempDir -Force
+        Compress-Archive -Path "$tempDir/*" -DestinationPath ${{github.workspace}}/test.zip -Force
+
     - name: Store artifact
       uses: actions/upload-artifact@v4
       with:
         name: ${{github.event.repository.name}}
-        path: ${{env.BUILD_DIR}}/*.zip
+        path: ${{github.workspace}}/test.zip
         retention-days: 5
