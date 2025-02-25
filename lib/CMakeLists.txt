@@ -1,5 +1,7 @@
 cmake_minimum_required ( VERSION 3.26 )
 
+set ( TARGET fsm-lib )
+
 make_static_library ( ${TARGET} )
 
 install (
