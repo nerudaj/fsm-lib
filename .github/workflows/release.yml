@@ -49,7 +49,7 @@ jobs:
         New-Item -ItemType Directory -Path $tempDir -Force
         Expand-Archive -Path ${{github.workspace}}/Debug/*.zip -DestinationPath $tempDir -Force
         Expand-Archive -Path ${{github.workspace}}/Release/*.zip -DestinationPath $tempDir -Force
-        $archiveName = $(Get-ChildItem -Path "." -Directory | Select-Object -First 1 -ExpandProperty Name)
+        $archiveName = $(Get-ChildItem -Path "$tempDir" -Directory | Select-Object -First 1 -ExpandProperty Name)
         Compress-Archive -Path "$tempDir/$archiveName/*" -DestinationPath ${{github.workspace}}/$archiveName.zip -Force
 
     - name: Store artifact
