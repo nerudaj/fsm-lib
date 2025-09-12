@@ -1,6 +1,7 @@
 #include "Blackboard.hpp"
 #include "TestableLogger.hpp"
 #include "catch_amalgamated.hpp"
+#include <filesystem>
 #include <fsm/logging/CsvLogger.hpp>
 
 TEST_CASE("[Logger]")
@@ -45,7 +46,7 @@ TEST_CASE("[Logger]")
             std::getline(load, line);
         }
 
-        unlink("./log.txt");
+        std::filesystem::remove("./log.txt");
 
         REQUIRE(line == "MachineId,BlackboardId,BlackboardLog,Message,CurrentStateName,TargetStateName,Duration (us)");
     }
