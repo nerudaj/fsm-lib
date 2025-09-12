@@ -1,4 +1,4 @@
-name: CI-Ninja-Clang-Windows
+name: CI-Ninja-Clang
 
 on:
   push:
@@ -12,7 +12,10 @@ env:
 
 jobs:
   build:
-    runs-on: windows-2022
+    strategy:
+      matrix:
+        platform: [windows-2022, ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
 
     steps:
     - uses: actions/checkout@v4
