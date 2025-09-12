@@ -21,27 +21,27 @@ namespace fsm::detail
         CompiledTransition(const CompiledTransition&&) = delete;
 
     public:
-        constexpr [[nodiscard]] auto begin(this auto&& self) noexcept
+        [[nodiscard]] constexpr auto begin(this auto&& self) noexcept
         {
             return std::begin(self.data);
         }
 
-        constexpr [[nodiscard]] auto end(this auto&& self) noexcept
+        [[nodiscard]] constexpr auto end(this auto&& self) noexcept
         {
             return std::begin(self.data) + self.size;
         }
 
-        constexpr [[nodiscard]] size_t getSize() const noexcept
+        [[nodiscard]] constexpr size_t getSize() const noexcept
         {
             return size;
         }
 
-        constexpr [[nodiscard]] bool isEmpty() const noexcept
+        [[nodiscard]] constexpr bool isEmpty() const noexcept
         {
             return size == 0;
         }
 
-        constexpr [[nodiscard]] auto&&
+        [[nodiscard]] constexpr auto&&
         operator[](this auto&& self, size_t index) noexcept
         {
             assert(index < self.size);

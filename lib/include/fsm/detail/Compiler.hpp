@@ -12,11 +12,11 @@ namespace fsm::detail
     class Compiler final
     {
     public:
-        static [[nodiscard]] CompiledTransition compileTransition(
+        [[nodiscard]] static CompiledTransition compileTransition(
             const TransitionContext& destination, const StateIndex& index);
 
         template<BlackboardTypeConcept BbT>
-        static [[nodiscard]] CompiledConditionalTransition<BbT>
+        [[nodiscard]] static CompiledConditionalTransition<BbT>
         compileConditionalTransition(
             Condition<BbT>&& condition,
             const TransitionContext& destination,
@@ -29,7 +29,7 @@ namespace fsm::detail
         }
 
         template<BlackboardTypeConcept BbT>
-        static [[nodiscard]] CompiledConditionalTransition<BbT>
+        [[nodiscard]] static CompiledConditionalTransition<BbT>
         compileGlobalErrorTransition(
             BuilderContext<BbT>& context, const StateIndex& index)
         {
@@ -47,7 +47,7 @@ namespace fsm::detail
         }
 
         template<BlackboardTypeConcept BbT>
-        static [[nodiscard]] std::vector<CompiledConditionalTransition<BbT>>
+        [[nodiscard]] static std::vector<CompiledConditionalTransition<BbT>>
         compileAllConditionalTransitions(
             std::vector<ConditionalTransitionContext<BbT>>& transitions,
             const StateIndex& index)
@@ -65,7 +65,7 @@ namespace fsm::detail
         }
 
         template<BlackboardTypeConcept BbT>
-        static [[nodiscard]] CompiledState<BbT>
+        [[nodiscard]] static CompiledState<BbT>
         compileState(StateBuilderContext<BbT>& state, const StateIndex& index)
         {
             return CompiledState<BbT> {
@@ -78,7 +78,7 @@ namespace fsm::detail
         }
 
         template<BlackboardTypeConcept BbT>
-        static [[nodiscard]] std::vector<CompiledState<BbT>>
+        [[nodiscard]] static std::vector<CompiledState<BbT>>
         compileMachine(BuilderContext<BbT>& context, const StateIndex& index)
         {
             return index.getIndexedStateNames()

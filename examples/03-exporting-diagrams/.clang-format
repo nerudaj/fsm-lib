@@ -65,6 +65,7 @@ BraceWrapping:
   SplitEmptyFunction: true
   SplitEmptyRecord: true
   SplitEmptyNamespace: true
+InsertNewlineAtEOF: true
 
 # Unsupported in MSVC 17.5.2
 # LanguageStandard: Cpp20

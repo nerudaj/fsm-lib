@@ -1,5 +1,6 @@
 #pragma once
 
+#include <format>
 #include <fsm/Types.hpp>
 #include <string>
 #include <vector>

@@ -10,14 +10,15 @@ if ( ${BOOTSTRAP_CPM} )
 	bootstrap_cpm ()
 endif ()
 
-set_cpp23_x64()
+set ( CMAKE_CXX_STANDARD		   23 )
+set ( CMAKE_CXX_STANDARD_REQUIRED  ON )
 
 get_version_from_git (
 	PROJECT_VERSION_VARIABLE GIT_PROJECT_VERSION
 	FULL_VERSION_VARIABLE FULL_PROJECT_VERSION
 )
 
-project ( fsm-lib VERSION "${GIT_PROJECT_VERSION}" )
+project ( fsm-lib VERSION "${GIT_PROJECT_VERSION}" LANGUAGES CXX )
 
 if (NOT ${PROJECT_IS_TOP_LEVEL} )
 	message ( "INFO: fsm-lib is used as a dependency, turning off unwanted features" )
@@ -58,8 +59,10 @@ if ( ${PROJECT_IS_TOP_LEVEL} )
     if ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" )
         set ( COMPILER_ID "${CMAKE_CXX_COMPILER_ID}-${MSVC_TOOLSET_VERSION}" )
     else ()
-        message ( FATAL_ERROR "Unsupported compiler ID: ${CMAKE_CXX_COMPILER_ID}" )
+        set ( COMPILER_ID "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}" )
     endif ()
+
+    message ( "Packaging with compiler ID: ${COMPILER_ID}" )
 
 	set ( CPACK_GENERATOR "ZIP" )
 	set ( CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${FULL_PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_GENERATOR_PLATFORM}-${COMPILER_ID}" )
