@@ -33,18 +33,13 @@ jobs:
         mkdir "${{env.BUILD_DIR}}"
         cd "${{env.BUILD_DIR}}"
         cmake -G Ninja -D CMAKE_CXX_COMPILER=clang++ ..
-      shell: cmd
 
     - name: Build
       working-directory: ${{env.BUILD_DIR}}
       run: |
-        cmake --build . --config Debug
-        cmake --build . --config Release
-      shell: cmd
+        cmake --build .
 
     - name: Test
       working-directory: ${{env.BUILD_DIR}}
       run: |
-        ctest -C Debug
-        ctest -C Release
-      shell: cmd
+        ctest --output-on-failure
