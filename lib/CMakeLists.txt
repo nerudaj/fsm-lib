@@ -4,6 +4,12 @@ set ( TARGET fsm-lib )
 
 make_static_library ( ${TARGET} )
 
+if ( "${CMAKE_SYSTEM_NAME}" STREQUAL "Android" )
+    target_link_libraries ( ${TARGET}
+        PUBLIC android log
+    )
+endif()
+
 if ( NOT "${PROJECT_VERSION}" STREQUAL "" )
     install (
         DIRECTORY    "${CMAKE_CURRENT_SOURCE_DIR}/include"
