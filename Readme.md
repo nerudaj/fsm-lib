@@ -1,4 +1,7 @@
-[![CI](https://github.com/nerudaj/dgm-fsm-lib/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/nerudaj/dgm-fsm-lib/actions/workflows/main.yml) [![IntegrationTests](https://github.com/nerudaj/fsm-lib/actions/workflows/integration.yml/badge.svg?branch=main)](https://github.com/nerudaj/fsm-lib/actions/workflows/integration.yml)
+[![CI-MSVC-Windows](https://github.com/nerudaj/fsm-lib/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/nerudaj/fsm-lib/actions/workflows/main.yml) 
+[![CI-Ninja-Clang (Windows/Ubuntu)](https://github.com/nerudaj/fsm-lib/actions/workflows/main-clang.yml/badge.svg?branch=main)](https://github.com/nerudaj/fsm-lib/actions/workflows/main-clang.yml) 
+[![CI-Ninja-Clang (Android)](https://github.com/nerudaj/fsm-lib/actions/workflows/main-android.yml/badge.svg?branch=main)](https://github.com/nerudaj/fsm-lib/actions/workflows/main-android.yml) 
+[![IntegrationTests](https://github.com/nerudaj/fsm-lib/actions/workflows/integration.yml/badge.svg?branch=main)](https://github.com/nerudaj/fsm-lib/actions/workflows/integration.yml)
 
 # fsm-lib
 
