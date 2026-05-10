@@ -1,0 +1,33 @@
+name: Static-Analysis
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  BUILD_DIR: ${{github.workspace}}/build
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install cppcheck
+      run: |
+        winget install -e --id Cppcheck.Cppcheck
+      shell: cmd
+
+    - name: Cppcheck
+      working-directory: ${{github.workspace}}
+      run: |
+        cppcheck ./lib/src \
+        -I ./lib/include/ \
+        --enable=all \
+        --suppress=unusedFunction \
+        --suppress=missingIncludeSystem
+      shell: cmd
