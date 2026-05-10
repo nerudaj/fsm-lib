@@ -19,7 +19,7 @@ jobs:
 
     - name: Install cppcheck
       run: |
-        winget install -e --id Cppcheck.Cppcheck
+        winget install -e --id Cppcheck.Cppcheck --accept-source-agreements --accept-package-agreements
       shell: cmd
 
     - name: Cppcheck
