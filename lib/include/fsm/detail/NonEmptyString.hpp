@@ -17,7 +17,7 @@ namespace fsm::detail
         using StringT = std::basic_string_view<CharT>;
 
     public:
-        explicit consteval NonEmptyString(const CharT* str) noexcept : data(str)
+        consteval NonEmptyString(const CharT* str) noexcept : data(str)
         {
             if (data.empty())
                 you_see_this_error_because_you_used_empty_string_in_fsm_builder();
