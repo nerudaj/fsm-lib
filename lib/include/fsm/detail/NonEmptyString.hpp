@@ -17,6 +17,7 @@ namespace fsm::detail
         using StringT = std::basic_string_view<CharT>;
 
     public:
+        // cppcheck-suppress noExplicitConstructor
         consteval NonEmptyString(const CharT* str) noexcept : data(str)
         {
             if (data.empty())

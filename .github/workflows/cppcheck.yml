@@ -24,5 +24,6 @@ jobs:
         -I ./lib/include/ \
         --enable=all \
         --suppress=unusedFunction \
-        --suppress=missingIncludeSystem
+        --suppress=missingIncludeSystem \
+        --error-exitcode=2 --inline-suppr
       shell: bash
