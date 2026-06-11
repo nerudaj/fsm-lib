@@ -1,3 +1,6 @@
+fsm-lib v2.x.x changelog:
+ - Added CMakePresets.json for better integration with VS Code
+
 fsm-cpp v2.1.1 changelog:
  - Release can now be included into your CMakeLists through `find_package`
  - Added alias `fsm::fsm-lib`, you should use that for linking
