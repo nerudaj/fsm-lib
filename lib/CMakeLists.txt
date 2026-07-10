@@ -3,6 +3,7 @@ cmake_minimum_required ( VERSION 3.26 )
 set ( TARGET fsm-lib )
 
 make_static_library ( ${TARGET} )
+target_link_libraries ( ${TARGET} PRIVATE nlohmann_json::nlohmann_json )
 
 if ( "${CMAKE_SYSTEM_NAME}" STREQUAL "Android" )
     target_link_libraries ( ${TARGET}
@@ -15,6 +16,14 @@ if ( NOT "${PROJECT_VERSION}" STREQUAL "" )
         DIRECTORY    "${CMAKE_CURRENT_SOURCE_DIR}/include"
         DESTINATION  "."
     )
+
+    install(TARGETS
+        nlohmann_json
+        EXPORT ${TARGET}Targets
+        ARCHIVE DESTINATION LIB
+    )
+
+    install(EXPORT ${TARGET}Targets NAMESPACE nlohmann_json:: DESTINATION lib/cmake/${TARGET})
 
     install ( TARGETS ${TARGET}
         EXPORT ${TARGET}Config

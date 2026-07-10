@@ -26,6 +26,8 @@ if (NOT ${PROJECT_IS_TOP_LEVEL} )
 	set ( BUILD_EXAMPLES OFF )
 endif ()
 
+CPMAddPackage ("gh:nlohmann/json@3.12.0")
+
 add_subdirectory ( "${PROJECT_SOURCE_DIR}/lib" )
 add_library ( fsm::fsm-lib ALIAS fsm-lib )
 
