@@ -38,6 +38,28 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
+        },
+        {
+            "name": "msvc-17",
+            "inherits": "base",
+            "displayName": "MSVC - Visual Studio generator (MSBuild)",
+            "description": "Configure using Visual Studio generator (selects MSBuild).",
+            "generator": "Visual Studio 17 2022",
+            "binaryDir": "${sourceDir}/_build",
+            "cacheVariables": {
+                "CMAKE_GENERATOR_PLATFORM": "x64"
+            }
+        },
+        {
+            "name": "Custom configure preset",
+            "displayName": "Custom configure preset",
+            "description": "Sets Ninja generator, build and install directory",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+            }
         }
     ],
     "buildPresets": [
@@ -54,6 +76,20 @@
             "targets": [
                 "all"
             ]
+        },
+        {
+            "name": "build-msvc-17-debug",
+            "displayName": "Build (MSVC Debug)",
+            "configurePreset": "msvc-17",
+            "configuration": "Debug",
+            "jobs": 4
+        },
+        {
+            "name": "build-msvc-17-release",
+            "displayName": "Build (MSVC Release)",
+            "configurePreset": "msvc-17",
+            "configuration": "Release",
+            "jobs": 4
         }
     ]
 }
