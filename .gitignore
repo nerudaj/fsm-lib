@@ -1,7 +1,9 @@
+.vs
 _build
 _build*
 vsbuild
 RELEASE
+out/*
 
 # Prerequisites
 *.d

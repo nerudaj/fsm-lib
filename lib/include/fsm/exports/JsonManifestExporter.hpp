@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fsm/exports/ManifestExporterInterface.hpp"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -8,7 +9,7 @@
 namespace fsm
 {
 
-class [[nodiscard]] JsonManifestExporter final
+class [[nodiscard]] JsonManifestExporter final : public ManifestExporterInterface
 {
 public:
     explicit JsonManifestExporter(std::ostream& os = std::cout) noexcept;
@@ -18,7 +19,7 @@ public:
 public:
     void writeManifest(
         const std::vector<std::string>& actionNames,
-        const std::vector<std::string>& conditionNames);
+        const std::vector<std::string>& conditionNames) override;
 
 private:
     std::ostream& os;
