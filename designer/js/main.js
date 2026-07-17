@@ -69,16 +69,27 @@ function redo() {
  * @param {any} e 
  */
 function addState(e) {
-    var stateNameInput = document.getElementById("StateNameInput");
-    var actionNameSelect = document.getElementById("StateActionName");
+    console.log("addState:begin");
+    var stateNameInput = document.getElementById("AddState_NameInput");
+    var actionNameSelect = document.getElementById("AddState_ActionInput");
 
-    if (!program) return;
-    if (!stateNameInput || !(stateNameInput instanceof HTMLInputElement)) return;
-    if (!actionNameSelect || !(actionNameSelect instanceof HTMLSelectElement)) return;
+    if (!program) {
+        console.error("Program is null");
+        return;
+    }
+    else if (!stateNameInput || !(stateNameInput instanceof HTMLInputElement)) {
+        console.error("State name input is either null or wrong type");
+        return;
+    }
+    else if (!actionNameSelect || !(actionNameSelect instanceof HTMLSelectElement)) {
+        console.error("Action name input is either null or wrong type");
+        return;
+    }
 
     program.addNewState(
         stateNameInput.value,
         actionNameSelect.value);
+    console.log("addState:end");
 }
 
 /**
@@ -101,6 +112,20 @@ function updateState(e) {
         stateNameInput.value,
         actionNameSelect.value,
         defaultTransitionSelect.value);
+}
+
+/**
+ * @param {string} id 
+ */
+function showModal(id) {
+    const modalElement = document.getElementById(id);
+    if (!modalElement) {
+        console.error("Modal element not found.");
+        return;
+    }
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    modal.show();
 }
 
 function main() {

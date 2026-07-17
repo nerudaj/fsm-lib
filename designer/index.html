@@ -8,8 +8,11 @@
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
     <script type="text/javascript" src="js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="js/cytoscape.min.js"></script>
+    <script type="text/javascript" src="js/Sortable.min.js"></script>
+    <script type="text/javascript" src="js/result.js"></script>
     <script type="text/javascript" src="js/manifest.js"></script>
     <script type="text/javascript" src="js/model.js"></script>
+    <script type="text/javascript" src="js/graphIR.js"></script>
     <script type="text/javascript" src="js/program.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
 </head>
@@ -19,8 +22,7 @@
     <nav class="navbar navbar-expand-lg bg-body-secondary">
         <div class="container-fluid">
             <div class="navbar-brand">FSM Designer</div>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
-                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
@@ -80,7 +82,8 @@
                         </li>
 
                         <li>
-                            <button class="btn btn-tertiary w-100" onclick=" addTransitionInput()" disabled>+</button>
+                            <button class="btn btn-tertiary w-100" onclick="addTransitionInput()" disabled
+                                id="EditState_AddTransitionButton">+</button>
                         </li>
 
                         <li>
@@ -102,6 +105,15 @@
                             <select class="form-select" id="EditState_DestinationSelect" disabled>
                             </select>
                         </li>
+
+                        <li>
+                            <hr>
+                        </li>
+
+                        <li>
+                            <button class="btn btn-primary w-100" onclick="updateState()" disabled
+                                id="EditState_ApplyUpdate">Apply</button>
+                        </li>
                     </ul>
                 </div>
             </nav>
@@ -115,23 +127,22 @@
     </div>
 
     <!-- CREATE STATE MODAL -->
-    <div class="modal fade" id="createNodeModal" tabindex="-1" aria-labelledby="createNodeModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="createNodeModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="createNodeModalLabel">State inspector</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="createNodeForm" onsubmit="event.preventDefault(); addState(event);">
                         <div class="mb-3">
-                            <label for="StateNameInput" class="form-label">State name</label>
-                            <input type="text" class="form-control" id="StateNameInput" required>
+                            <label for="AddState_NameInput" class="form-label">State name</label>
+                            <input type="text" class="form-control" id="AddState_NameInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="StateActionName" class="form-label">Default action</label>
-                            <select class="form-select" id="StateActionName" required>
+                            <label for="AddState_ActionInput" class="form-label">Default action</label>
+                            <select class="form-select" id="AddState_ActionInput" required>
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Add State</button>

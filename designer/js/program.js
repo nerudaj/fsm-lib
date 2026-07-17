@@ -47,18 +47,27 @@ function createDefaultGraph() {
 
 class Program {
     constructor() {
-        /** @type {ManifestModel} */
-        this.manifest = new ManifestModel(null);
-
-        /** @type {FsmModel} */
-        this.fsm = new FsmModel(null);
-
         /** @type {cytoscape} */
         this.graph = createDefaultGraph();
-        this.graph.on("dbltap", "node", /** @param {any} evt */(evt) => {
+        this.graph.on("tap", "node", /** @param {any} evt */(evt) => {
             const node = evt.target;
             this.onNodeClicked(node);
         });
+
+        this.graph.on("dragfree", "node", /** @param {any} evt */(evt) => {
+            const node = evt.target;
+            const position = node.position();
+            console.log(position);
+        })
+
+        this.ir = new GraphIR();
+    }
+
+    /**
+     * @returns {{[key: string]: GraphStateIR}}
+     */
+    getCurrentStates() {
+        return this.ir.getCurrentMachine().states;
     }
 
     /**
@@ -70,7 +79,7 @@ class Program {
             select.remove(0);
         }
 
-        for (const actionName of this.manifest.actionNames) {
+        for (const actionName of this.ir.manifest.actionNames) {
             const option = document.createElement("option");
             option.value = actionName;
             option.text = actionName;
@@ -86,7 +95,7 @@ class Program {
             select.remove(0);
         }
 
-        for (const state in this.fsm.states) {
+        for (const state in this.getCurrentStates()) {
             const option = document.createElement("option");
             option.value = state;
             option.text = state;
@@ -106,7 +115,7 @@ class Program {
                 this.manifest = new ManifestModel(manifest);
 
                 // Update modals
-                var select = document.getElementById("StateActionName");
+                var select = document.getElementById("AddState_ActionInput");
                 if (select && select instanceof HTMLSelectElement) {
                     this.updateActionNameSelect(select);
                 }
@@ -152,13 +161,13 @@ class Program {
      * @param {any} node 
      */
     onNodeClicked(node) {
-        var oldStateNameInput = document.getElementById("EditModalOldStateNameInput");
-        var stateNameInput = document.getElementById("EditModalStateNameInput");
-        var actionNameSelect = document.getElementById("EditModalStateActionName");
-        var defaultTransitionSelect = document.getElementById("EditModalDefaultTransition");
+        var stateNameInput = document.getElementById("EditState_NameInput");
+        var addTransitionButton = document.getElementById("EditState_AddTransitionButton");
+        var actionNameSelect = document.getElementById("EditState_ActionSelect");
+        var defaultTransitionSelect = document.getElementById("EditState_DestinationSelect");
 
         if (!program) return;
-        if (!oldStateNameInput || !(oldStateNameInput instanceof HTMLInputElement)) return;
+        if (!addTransitionButton || !(addTransitionButton instanceof HTMLButtonElement)) return;
         if (!stateNameInput || !(stateNameInput instanceof HTMLInputElement)) return;
         if (!actionNameSelect || !(actionNameSelect instanceof HTMLSelectElement)) return;
         if (!defaultTransitionSelect || !(defaultTransitionSelect instanceof HTMLSelectElement)) return;
@@ -166,20 +175,15 @@ class Program {
         this.updateActionNameSelect(actionNameSelect);
         this.updateTransitionDestinationSelect(defaultTransitionSelect);
 
+        stateNameInput.disabled = false;
+        addTransitionButton.disabled = false;
+        actionNameSelect.disabled = false;
+        defaultTransitionSelect.disabled = false;
+
         const stateName = node.id();
-        oldStateNameInput.value = stateName;
         stateNameInput.value = stateName;
-        actionNameSelect.value = program.fsm.states[stateName].actionName;
-        defaultTransitionSelect.value = program.fsm.states[stateName].destinationTargetName;
-
-        const modalElement = document.getElementById("EditStateModal");
-        if (!modalElement) {
-            console.error("Modal element not found.");
-            return;
-        }
-
-        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-        modal.show();
+        actionNameSelect.value = this.getCurrentStates()[stateName].actionName;
+        defaultTransitionSelect.value = this.getCurrentStates()[stateName].destinationId;
     }
 
     /** 
@@ -187,15 +191,19 @@ class Program {
      * @param {string} actionName 
      */
     addNewState(stateName, actionName) {
-        if (stateName in this.fsm.states) {
+        if (stateName in this.getCurrentStates()) {
             console.error(`State "${stateName}" already exists.`);
             return;
         }
 
-        this.fsm.states[stateName] = new FsmStateModel();
-        this.fsm.states[stateName].actionName = actionName;
+        const id = this.ir.getNewStateId();
+        this.getCurrentStates()[id] = new GraphStateIR(
+            id,
+            stateName,
+            actionName);
+
         this.graph.add([
-            { group: 'nodes', data: { id: stateName, label: `${stateName} (${actionName})` } },
+            { group: 'nodes', data: { id: id, label: `${stateName} (${actionName})` } },
         ]);
 
         this.graph.layout({ name: 'cose' }).run();
@@ -208,17 +216,19 @@ class Program {
      * @param {string} defaultTransition 
      */
     updateState(oldStateName, newStateName, actionName, defaultTransition) {
-        if (!(oldStateName in this.fsm.states)) {
+        // TODO: all of this
+
+        if (!(oldStateName in this.getCurrentStates())) {
             console.error(`State "${oldStateName}" does not exist.`);
             return;
         }
 
         // Update the state in the FSM model
-        const state = this.fsm.states[oldStateName];
-        delete this.fsm.states[oldStateName];
+        const state = this.getCurrentStates()[oldStateName];
+        delete this.getCurrentStates()[oldStateName];
         state.actionName = actionName;
-        state.destinationTargetName = defaultTransition;
-        this.fsm.states[newStateName] = state;
+        state.destinationId = defaultTransition;
+        this.getCurrentStates()[newStateName] = state;
 
         // TODO: all references to this state need to be updated
     }
