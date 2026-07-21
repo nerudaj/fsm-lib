@@ -70,7 +70,8 @@
 
                         <li>
                             <label for="EditState_NameInput" class="form-label">State name</label>
-                            <input type="text" class="form-control" id="EditState_NameInput" disabled>
+                            <input type="text" class="form-control" id="EditState_NameInput" disabled
+                                onchange="onEditStateNameChange(event);">
                         </li>
 
                         <li>
@@ -96,7 +97,8 @@
 
                         <li>
                             <label for="EditState_ActionSelect" class="form-label">Action</label>
-                            <select class="form-select" id="EditState_ActionSelect" disabled>
+                            <select class="form-select" id="EditState_ActionSelect" disabled
+                                onchange="onEditStateActionChange(event);">
                             </select>
                         </li>
 
@@ -108,11 +110,6 @@
 
                         <li>
                             <hr>
-                        </li>
-
-                        <li>
-                            <button class="btn btn-primary w-100" onclick="updateState()" disabled
-                                id="EditState_ApplyUpdate">Apply</button>
                         </li>
                     </ul>
                 </div>

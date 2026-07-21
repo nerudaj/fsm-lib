@@ -99,10 +99,10 @@ class GraphIR {
 
     /**
      * @param {string} id
-     * @param {string} newName
-     * @param {[GraphTransitionIR]|[]} newTransitions
-     * @param {string} newAction
-     * @param {string} newDestination
+     * @param {string|null} newName
+     * @param {[GraphTransitionIR]|null} newTransitions
+     * @param {string|null} newAction
+     * @param {string|null} newDestination
      */
     updateStateProperties(id, newName, newTransitions, newAction, newDestination) {
         if (!(id in this.getCurrentMachine().states)) {
@@ -112,9 +112,9 @@ class GraphIR {
 
         let state = this.getCurrentMachine().states[id];
 
-        state.name = newName;
-        state.transitions = newTransitions;
-        state.actionName = newAction;
-        state.destinationId = newDestination;
+        if (newName) state.name = newName;
+        if (newTransitions) state.transitions = newTransitions;
+        if (newAction) state.actionName = newAction;
+        if (newDestination) state.destinationId = newDestination;
     }
 }

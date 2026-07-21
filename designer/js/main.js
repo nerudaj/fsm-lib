@@ -115,6 +115,30 @@ function updateState(e) {
 }
 
 /**
+ * @param {any} event 
+ */
+function onEditStateNameChange(event) {
+    if (!program) {
+        console.error("Program is null");
+        return;
+    }
+
+    program.onSelectedStateNameChange(event.target.value);
+}
+
+/**
+ * @param {any} event
+ */
+function onEditStateActionChange(event) {
+    if (!program) {
+        console.error("Program is null");
+        return;
+    }
+
+    program.onSelectedStateActionChange(event.target.value);
+}
+
+/**
  * @param {string} id 
  */
 function showModal(id) {

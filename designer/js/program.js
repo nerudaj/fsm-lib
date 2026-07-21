@@ -14,12 +14,15 @@ function createDefaultGraph() {
                 selector: "node",
                 style: {
                     label: "data(label)",
+                    shape: 'round-rectangle',
                     "background-color": "#3b82f6",
                     color: "#fff",
                     "text-valign": "center",
                     "text-halign": "center",
-                    width: 44,
-                    height: 44
+                    "font-size": 10,
+                    "text-wrap": "wrap",
+                    "text-max-width": 80,
+                    "text-justification": "center",
                 }
             },
             {
@@ -47,12 +50,20 @@ function createDefaultGraph() {
 
 class Program {
     constructor() {
+        /** @type {GraphIR} */
+        this.ir = new GraphIR();
+
+        /** @type {string|null} */
+        this.selectedState = null;
+
         /** @type {cytoscape} */
         this.graph = createDefaultGraph();
         this.graph.on("tap", "node", /** @param {any} evt */(evt) => {
             const node = evt.target;
             this.onNodeClicked(node);
         });
+
+        // TODO: node unselect
 
         this.graph.on("dragfree", "node", /** @param {any} evt */(evt) => {
             const node = evt.target;
@@ -61,9 +72,7 @@ class Program {
             const y = node.position().y;
             console.log(`Updating position of ${id} to [${x}, ${y}]`);
             this.ir.updateStatePosition(id, x, y);
-        })
-
-        this.ir = new GraphIR();
+        });
     }
 
     /**
@@ -184,6 +193,7 @@ class Program {
         defaultTransitionSelect.disabled = false;
 
         const stateName = node.id();
+        this.selectedState = stateName;
         stateNameInput.value = stateName;
         actionNameSelect.value = this.getCurrentStates()[stateName].actionName;
         defaultTransitionSelect.value = this.getCurrentStates()[stateName].destinationId;
@@ -213,23 +223,30 @@ class Program {
     }
 
     /**
-     * @param {string} oldStateName 
-     * @param {string} newStateName 
-     * @param {string} actionName 
-     * @param {string} defaultTransition 
+     * @param {string} newName 
      */
-    updateState(oldStateName, newStateName, actionName, defaultTransition) {
-        // TODO: all of this
-
-        if (!(oldStateName in this.getCurrentStates())) {
-            console.error(`State "${oldStateName}" does not exist.`);
+    onSelectedStateNameChange(newName) {
+        if (!this.selectedState) {
+            console.error("selected state is null");
             return;
         }
 
-        // Update the state in the FSM model
-        this.ir.updateStateProperties("TODO", newStateName, [], actionName, defaultTransition);
+        this.ir.updateStateProperties(this.selectedState, newName, null, null, null);
+        // TODO: update cytoscape
+        this.graph.$id(this.selectedState)[0].data('label', 'XXX');
+    }
 
-        // TODO: all references to this state need to be updated
+    /**
+     * @param {string} newAction 
+     */
+    onSelectedStateActionChange(newAction) {
+        if (!this.selectedState) {
+            console.error("selected state is null");
+            return;
+        }
+
+        this.ir.updateStateProperties(this.selectedState, null, null, newAction, null);
+        // TODO: update cytoscape
     }
 
     undo() { }
