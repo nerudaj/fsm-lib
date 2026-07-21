@@ -71,12 +71,6 @@ class GraphIR {
      * @returns {Result}
      */
     isValid() {
-        if (!(this.mainFSM.entryStateId in this.mainFSM.states)) {
-            return new Result(
-                false,
-                `Entry state ${this.mainFSM.entryStateId} for main machine not present in states`);
-        }
-
         return new Result(false, "Not implemented yet");
     }
 
@@ -86,5 +80,41 @@ class GraphIR {
     getNewStateId() {
         this.stateCounter++;
         return `State${this.stateCounter}`;
+    }
+
+    /**
+     * @param {string} id 
+     * @param {number} x 
+     * @param {number} y 
+     */
+    updateStatePosition(id, x, y) {
+        if (!(id in this.getCurrentMachine().states)) {
+            alert(`State ${id} not present in current FSM`);
+            return;
+        }
+
+        this.getCurrentMachine().states[id].x = x;
+        this.getCurrentMachine().states[id].y = y;
+    }
+
+    /**
+     * @param {string} id
+     * @param {string} newName
+     * @param {[GraphTransitionIR]|[]} newTransitions
+     * @param {string} newAction
+     * @param {string} newDestination
+     */
+    updateStateProperties(id, newName, newTransitions, newAction, newDestination) {
+        if (!(id in this.getCurrentMachine().states)) {
+            alert(`State ${id} not present in current FSM`);
+            return;
+        }
+
+        let state = this.getCurrentMachine().states[id];
+
+        state.name = newName;
+        state.transitions = newTransitions;
+        state.actionName = newAction;
+        state.destinationId = newDestination;
     }
 }

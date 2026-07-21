@@ -56,8 +56,11 @@ class Program {
 
         this.graph.on("dragfree", "node", /** @param {any} evt */(evt) => {
             const node = evt.target;
-            const position = node.position();
-            console.log(position);
+            const id = node.id();
+            const x = node.position().x;
+            const y = node.position().y;
+            console.log(`Updating position of ${id} to [${x}, ${y}]`);
+            this.ir.updateStatePosition(id, x, y);
         })
 
         this.ir = new GraphIR();
@@ -112,7 +115,7 @@ class Program {
                 const manifest = JSON.parse(jsonText);
                 console.log("Selected file:", file.name);
                 console.log("Parsed JSON:", manifest);
-                this.manifest = new ManifestModel(manifest);
+                this.ir.manifest = new ManifestModel(manifest);
 
                 // Update modals
                 var select = document.getElementById("AddState_ActionInput");
@@ -224,11 +227,7 @@ class Program {
         }
 
         // Update the state in the FSM model
-        const state = this.getCurrentStates()[oldStateName];
-        delete this.getCurrentStates()[oldStateName];
-        state.actionName = actionName;
-        state.destinationId = defaultTransition;
-        this.getCurrentStates()[newStateName] = state;
+        this.ir.updateStateProperties("TODO", newStateName, [], actionName, defaultTransition);
 
         // TODO: all references to this state need to be updated
     }
