@@ -89,6 +89,30 @@ function addState(e) {
     console.log("addState:end");
 }
 
+function addTransitionInput() {
+    var list = document.getElementById("EditState_TransitionList");
+    if (!list) {
+        console.error("Transition list is null");
+        return;
+    }
+
+    var li = document.createElement("li");
+    list.appendChild(li);
+
+    var condSelect = document.createElement("select");
+    condSelect.className = "form-select col-5";
+    li.appendChild(condSelect);
+
+    var span = document.createElement("span");
+    span.className = "col-2";
+    span.textContent = " -> ";
+    li.appendChild(span);
+
+    var destSelect = document.createElement("select");
+    destSelect.className = "form-select col-5";
+    li.appendChild(destSelect);
+}
+
 /**
  * @param {any} event 
  */
