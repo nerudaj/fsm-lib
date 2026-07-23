@@ -10,6 +10,7 @@
     <script type="text/javascript" src="js/cytoscape.min.js"></script>
     <script type="text/javascript" src="js/Sortable.min.js"></script>
     <script type="text/javascript" src="js/result.js"></script>
+    <script type="text/javascript" src="js/programHistory.js"></script>
     <script type="text/javascript" src="js/manifest.js"></script>
     <script type="text/javascript" src="js/model.js"></script>
     <script type="text/javascript" src="js/graphIR.js"></script>
@@ -104,7 +105,8 @@
 
                         <li>
                             <label for="EditState_DestinationSelect" class="form-label">Transition to</label>
-                            <select class="form-select" id="EditState_DestinationSelect" disabled>
+                            <select class="form-select" id="EditState_DestinationSelect" disabled
+                                onchange="onEditStateDestinationSelect(event);">
                             </select>
                         </li>
 

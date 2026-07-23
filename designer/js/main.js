@@ -32,9 +32,6 @@ function loadManifest() {
             program.loadManifestFromFile(file);
         }
     });
-
-    // TODO: update add new state modal with list of action names
-    // TODO: update edit state modal with list of action names and condition names
 }
 
 function loadModel() {
@@ -93,28 +90,6 @@ function addState(e) {
 }
 
 /**
- * @param {any} e
- */
-function updateState(e) {
-    var oldStateNameInput = document.getElementById("EditModalOldStateNameInput");
-    var stateNameInput = document.getElementById("EditModalStateNameInput");
-    var actionNameSelect = document.getElementById("EditModalStateActionName");
-    var defaultTransitionSelect = document.getElementById("EditModalDefaultTransition");
-
-    if (!program) return;
-    if (!oldStateNameInput || !(oldStateNameInput instanceof HTMLInputElement)) return;
-    if (!stateNameInput || !(stateNameInput instanceof HTMLInputElement)) return;
-    if (!actionNameSelect || !(actionNameSelect instanceof HTMLSelectElement)) return;
-    if (!defaultTransitionSelect || !(defaultTransitionSelect instanceof HTMLSelectElement)) return;
-
-    program.updateState(
-        oldStateNameInput.value,
-        stateNameInput.value,
-        actionNameSelect.value,
-        defaultTransitionSelect.value);
-}
-
-/**
  * @param {any} event 
  */
 function onEditStateNameChange(event) {
@@ -136,6 +111,18 @@ function onEditStateActionChange(event) {
     }
 
     program.onSelectedStateActionChange(event.target.value);
+}
+
+/**
+ * @param {any} event
+ */
+function onEditStateDestinationSelect(event) {
+    if (!program) {
+        console.error("Program is null");
+        return;
+    }
+
+    program.onSelectedStateDestinationChange(event.target.value);
 }
 
 /**

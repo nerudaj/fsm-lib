@@ -2,6 +2,7 @@
  * @returns {cytoscape} A default graph instance
  */
 function createDefaultGraph() {
+    // docs https://js.cytoscape.org/
     const cy = cytoscape({
         container: document.getElementById("Graph"),
         elements: [
@@ -19,9 +20,10 @@ function createDefaultGraph() {
                     color: "#fff",
                     "text-valign": "center",
                     "text-halign": "center",
+                    width: 200,
                     "font-size": 10,
                     "text-wrap": "wrap",
-                    "text-max-width": 80,
+                    "text-max-width": 200,
                     "text-justification": "center",
                 }
             },
@@ -58,21 +60,22 @@ class Program {
 
         /** @type {cytoscape} */
         this.graph = createDefaultGraph();
-        this.graph.on("tap", "node", /** @param {any} evt */(evt) => {
-            const node = evt.target;
-            this.onNodeClicked(node);
+        this.graph.on("tap", /** @param {any} evt */(evt) => {
+            if (evt.target === this.graph) {
+                this.onNodeUnselected();
+            }
+            else if (evt.target.isNode()) {
+                this.onNodeClicked(evt.target);
+            }
         });
-
-        // TODO: node unselect
 
         this.graph.on("dragfree", "node", /** @param {any} evt */(evt) => {
-            const node = evt.target;
-            const id = node.id();
-            const x = node.position().x;
-            const y = node.position().y;
-            console.log(`Updating position of ${id} to [${x}, ${y}]`);
-            this.ir.updateStatePosition(id, x, y);
+            this.onNodeDragged(evt.target);
+
         });
+
+        /** @type {ProgramHistory} */
+        this.history = new ProgramHistory();
     }
 
     /**
@@ -107,10 +110,10 @@ class Program {
             select.remove(0);
         }
 
-        for (const state in this.getCurrentStates()) {
+        for (const [state, ir] of Object.entries(this.getCurrentStates())) {
             const option = document.createElement("option");
             option.value = state;
-            option.text = state;
+            option.text = ir.name;
             select.add(option);
         }
     }
@@ -170,15 +173,17 @@ class Program {
     }
 
     /**
-     * @param {any} node 
+     * @param {boolean} enabled 
+     * @param {string} stateName 
+     * @param {string} actionName 
+     * @param {string} destinationId 
      */
-    onNodeClicked(node) {
+    bootstrapStateEditForm(enabled, stateName, actionName, destinationId) {
         var stateNameInput = document.getElementById("EditState_NameInput");
         var addTransitionButton = document.getElementById("EditState_AddTransitionButton");
         var actionNameSelect = document.getElementById("EditState_ActionSelect");
         var defaultTransitionSelect = document.getElementById("EditState_DestinationSelect");
 
-        if (!program) return;
         if (!addTransitionButton || !(addTransitionButton instanceof HTMLButtonElement)) return;
         if (!stateNameInput || !(stateNameInput instanceof HTMLInputElement)) return;
         if (!actionNameSelect || !(actionNameSelect instanceof HTMLSelectElement)) return;
@@ -187,16 +192,49 @@ class Program {
         this.updateActionNameSelect(actionNameSelect);
         this.updateTransitionDestinationSelect(defaultTransitionSelect);
 
-        stateNameInput.disabled = false;
-        addTransitionButton.disabled = false;
-        actionNameSelect.disabled = false;
-        defaultTransitionSelect.disabled = false;
+        stateNameInput.disabled = !enabled;
+        addTransitionButton.disabled = !enabled;
+        actionNameSelect.disabled = !enabled;
+        defaultTransitionSelect.disabled = !enabled;
 
+        stateNameInput.value = stateName;
+        actionNameSelect.value = actionName;
+        defaultTransitionSelect.value = destinationId;
+    }
+
+    /**
+     * @param {any} node 
+     */
+    onNodeClicked(node) {
         const stateName = node.id();
         this.selectedState = stateName;
-        stateNameInput.value = stateName;
-        actionNameSelect.value = this.getCurrentStates()[stateName].actionName;
-        defaultTransitionSelect.value = this.getCurrentStates()[stateName].destinationId;
+
+        this.bootstrapStateEditForm(
+            /* enabled */ true,
+            this.getCurrentStates()[stateName].name,
+            this.getCurrentStates()[stateName].actionName,
+            this.getCurrentStates()[stateName].destinationId);
+    }
+
+    onNodeUnselected() {
+        this.selectedState = null;
+
+        this.bootstrapStateEditForm(
+            /* enabled */ false,
+            "",
+            "",
+            "");
+    }
+
+    /**
+     * @param {any} node
+     */
+    onNodeDragged(node) {
+        const id = node.id();
+        const x = node.position().x;
+        const y = node.position().y;
+        console.log(`Updating position of ${id} to [${x}, ${y}]`);
+        this.ir.updateStatePosition(id, x, y);
     }
 
     /** 
@@ -231,9 +269,13 @@ class Program {
             return;
         }
 
-        this.ir.updateStateProperties(this.selectedState, newName, null, null, null);
+        this.snapshotAndExecute(() => {
+            this.ir.updateStateProperties(
+                this.selectedState,
+                newName, null, null, null);
+        });
         // TODO: update cytoscape
-        this.graph.$id(this.selectedState)[0].data('label', 'XXX');
+        this.graph.$id(this.selectedState)[0].data('label', newName + " (" + this.getCurrentStates()[this.selectedState].actionName + ")");
     }
 
     /**
@@ -245,11 +287,66 @@ class Program {
             return;
         }
 
-        this.ir.updateStateProperties(this.selectedState, null, null, newAction, null);
+        this.snapshotAndExecute(() => {
+            this.ir.updateStateProperties(
+                this.selectedState,
+                null, null, newAction, null);
+        });
         // TODO: update cytoscape
     }
 
-    undo() { }
+    /**
+     * @param {string} newDestination
+     */
+    onSelectedStateDestinationChange(newDestination) {
+        if (!this.selectedState) {
+            console.error("selected state is null");
+            return;
+        }
 
-    redo() { }
+        this.snapshotAndExecute(() => {
+            this.ir.updateStateProperties(
+                this.selectedState,
+                null, null, null, newDestination);
+
+            // TODO: self-loop doesn't work yet
+            this.graph.add([{
+                group: "edges",
+                data: {
+                    id: `${this.selectedState}_${newDestination}`,
+                    source: this.selectedState,
+                    target: newDestination,
+                    label: "default"
+                }
+            }])
+        });
+    }
+
+    /**
+     * @param {() => void} action 
+     */
+    snapshotAndExecute(action) {
+        this.history.addSnapshot(JSON.stringify(this.ir));
+        action();
+    }
+
+    undo() {
+        const previousState = this.history.undo();
+        if (previousState === null) {
+            console.error("No history to undo.");
+            return;
+        }
+
+        this.ir = JSON.parse(previousState);
+    }
+
+    redo() {
+        const nextState = this.history.redo();
+        if (nextState === null) {
+            console.error("No history to redo.");
+            return;
+        }
+
+        this.ir = JSON.parse(nextState);
+    }
 }
