@@ -247,6 +247,15 @@ class Program {
     }
 
     /**
+     * @param {string} nodeId 
+     * @param {string} name 
+     * @param {string} action 
+     */
+    renameGraphNode(nodeId, name, action) {
+        this.graph.$id(nodeId)[0].data('label', `${name} (${action})`);
+    }
+
+    /**
      * @param {string} newName 
      */
     onSelectedStateNameChange(newName) {
@@ -260,8 +269,8 @@ class Program {
                 this.selectedState,
                 newName, null, null, null);
         });
-        // TODO: update cytoscape
-        this.graph.$id(this.selectedState)[0].data('label', newName + " (" + this.getCurrentStates()[this.selectedState].actionName + ")");
+
+        this.renameGraphNode(this.selectedState, newName, this.getCurrentStates()[this.selectedState].actionName);
     }
 
     /**
@@ -278,7 +287,8 @@ class Program {
                 this.selectedState,
                 null, null, newAction, null);
         });
-        // TODO: update cytoscape
+
+        this.renameGraphNode(this.selectedState, this.getCurrentStates()[this.selectedState].name, newAction);
     }
 
     /**
