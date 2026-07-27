@@ -90,32 +90,18 @@ class Program {
      * @param {HTMLSelectElement} select 
      */
     updateActionNameSelect(select) {
-        for (var i = 0; i < select.options.length; i++) {
-            select.remove(0);
-        }
-
-        for (const actionName of this.ir.manifest.actionNames) {
-            const option = document.createElement("option");
-            option.value = actionName;
-            option.text = actionName;
-            select.add(option);
-        }
+        populateSelectElement(
+            select,
+            this.ir.manifest.actionNames.map(actionName => ({ value: actionName, label: actionName })));
     }
 
     /**
      * @param {HTMLSelectElement} select 
      */
     updateTransitionDestinationSelect(select) {
-        for (var i = 0; i < select.options.length; i++) {
-            select.remove(0);
-        }
-
-        for (const [state, ir] of Object.entries(this.getCurrentStates())) {
-            const option = document.createElement("option");
-            option.value = state;
-            option.text = ir.name;
-            select.add(option);
-        }
+        populateSelectElement(
+            select,
+            Object.entries(this.getCurrentStates()).map(([state, ir]) => ({ value: state, label: ir.name })));
     }
 
     /**
