@@ -89,28 +89,52 @@ function addState(e) {
     console.log("addState:end");
 }
 
-function addTransitionInput() {
-    var list = document.getElementById("EditState_TransitionList");
-    if (!list) {
-        console.error("Transition list is null");
+/**
+ * @param {number} transitionIdx 
+ */
+function openAddTransitionModal(transitionIdx) {
+    if (!program) {
+        console.error("Program is null");
         return;
     }
 
-    var li = document.createElement("li");
-    list.appendChild(li);
+    var condSelect = document.getElementById("EditTransition_ConditionSelect");
+    var destSelect = document.getElementById("EditTransition_DestinationSelect");
+    var indexInput = document.getElementById("EditTransition_Index");
 
-    var condSelect = document.createElement("select");
-    condSelect.className = "form-select col-5";
-    li.appendChild(condSelect);
+    if (!condSelect || !(condSelect instanceof HTMLSelectElement)) {
+        console.error("Condition select is either null or wrong type");
+        return;
+    }
+    else if (!destSelect || !(destSelect instanceof HTMLSelectElement)) {
+        console.error("Destination select is either null or wrong type");
+        return;
+    }
+    else if (!indexInput || !(indexInput instanceof HTMLInputElement)) {
+        console.error("Index input is either null or wrong type");
+        return;
+    }
 
-    var span = document.createElement("span");
-    span.className = "col-2";
-    span.textContent = " -> ";
-    li.appendChild(span);
+    populateSelectElement(
+        condSelect,
+        program.ir.manifest.conditionNames.map(condName => ({ value: condName, label: condName })));
+    populateSelectElement(
+        destSelect,
+        Object.entries(program.getCurrentStates()).map(([state, ir]) => ({ value: state, label: ir.name })));
 
-    var destSelect = document.createElement("select");
-    destSelect.className = "form-select col-5";
-    li.appendChild(destSelect);
+    indexInput.value = transitionIdx !== null ? transitionIdx.toString() : "";
+
+    showModal("EditTransitionModal");
+}
+
+/**
+ * @param {any} event 
+ */
+function saveTransition(e) {
+    if (!program) {
+        console.error("Program is null");
+        return;
+    }
 }
 
 /**

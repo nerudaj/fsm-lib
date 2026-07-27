@@ -35,3 +35,15 @@ main #Graph {
 .center-text {
     text-align: center;
 }
+
+.my-col-5 {
+    width: 40%;
+}
+
+.my-col-2 {
+    width: 20%;
+}
+
+.hidden {
+    display: none;
+}

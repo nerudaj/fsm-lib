@@ -7,8 +7,6 @@ function populateSelectElement(selectElement, options) {
         selectElement.remove(i);
     }
 
-    console.log(selectElement.options);
-
     for (var { value, label } of options) {
         var option = document.createElement("option");
         option.value = value;

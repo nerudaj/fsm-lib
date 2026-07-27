@@ -171,12 +171,14 @@ class Program {
         var defaultTransitionSelect = document.getElementById("EditState_DestinationSelect");
 
         if (!addTransitionButton || !(addTransitionButton instanceof HTMLButtonElement)) return;
-        if (!stateNameInput || !(stateNameInput instanceof HTMLInputElement)) return;
-        if (!actionNameSelect || !(actionNameSelect instanceof HTMLSelectElement)) return;
-        if (!defaultTransitionSelect || !(defaultTransitionSelect instanceof HTMLSelectElement)) return;
+        else if (!stateNameInput || !(stateNameInput instanceof HTMLInputElement)) return;
+        else if (!actionNameSelect || !(actionNameSelect instanceof HTMLSelectElement)) return;
+        else if (!defaultTransitionSelect || !(defaultTransitionSelect instanceof HTMLSelectElement)) return;
 
-        this.updateActionNameSelect(actionNameSelect);
-        this.updateTransitionDestinationSelect(defaultTransitionSelect);
+        if (enabled) {
+            this.updateActionNameSelect(actionNameSelect);
+            this.updateTransitionDestinationSelect(defaultTransitionSelect);
+        }
 
         stateNameInput.disabled = !enabled;
         addTransitionButton.disabled = !enabled;
@@ -228,11 +230,6 @@ class Program {
      * @param {string} actionName 
      */
     addNewState(stateName, actionName) {
-        if (stateName in this.getCurrentStates()) {
-            console.error(`State "${stateName}" already exists.`);
-            return;
-        }
-
         const id = this.ir.getNewStateId();
         this.getCurrentStates()[id] = new GraphStateIR(
             id,

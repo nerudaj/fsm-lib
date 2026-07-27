@@ -90,7 +90,7 @@
                         </li>
 
                         <li>
-                            <button class="btn btn-tertiary w-100" onclick="addTransitionInput()" disabled
+                            <button class="btn btn-secondary w-100" onclick="openAddTransitionModal(-1);" disabled
                                 id="EditState_AddTransitionButton">+</button>
                         </li>
 
@@ -151,6 +151,36 @@
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Add State</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT TRANSITION MODAL -->
+    <div class="modal fade" id="EditTransitionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="EditTransitionModalLabel">Edit transition</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="EditTransitionForm" onsubmit="event.preventDefault(); saveTransition(event);">
+                        <div class="mb-3">
+                            <label for="EditTransition_ConditionSelect" class="form-label">Condition</label>
+                            <select class="form-select" id="EditTransition_ConditionSelect" required>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="EditTransition_DestinationSelect" class="form-label">Destination state</label>
+                            <select class="form-select" id="EditTransition_DestinationSelect" required>
+                            </select>
+                        </div>
+                        <div class="hidden">
+                            <input id="EditTransition_Index" type="number" />
+                        </div>
+                        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save Transition</button>
                     </form>
                 </div>
             </div>
