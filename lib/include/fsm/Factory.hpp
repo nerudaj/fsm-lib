@@ -47,37 +47,42 @@ namespace fsm
 
             auto states = stateMapToVector(model);
 
-            return buildState(0, states, builder).done().build();
+            return buildState<0>(states, builder).done().build();
         }
 
     private:
         template<size_t Idx>
-        auto buildState(
-            size_t idx,
+        fsm::detail::MachineBuilder<BbT, false, false> buildState(
             const std::vector<
                 std::pair<std::string, fsm::detail::FactoryFsmStateModel>>&
                 states,
             auto&& builder) const
         {
-            fsm::detail::StateBuilder<BbT, false, false> builderInternal =
-                idx == 0 ? builder.withEntryState(states[idx].first.data())
-                         : builder.withState(states[idx].first.data());
+            if (Idx == states.size() - 1) return builder;
 
-            if (idx == states.size() - 1) return builder;
+            auto&& builderInternal = [&]()
+            {
+                if constexpr (Idx == 0)
+                {
+                    return builder.withEntryState(states[Idx].first.data());
+                }
+                else
+                {
+                    return builder.withState(states[Idx].first.data());
+                }
+            }();
 
-            auto& model = states[idx].second;
+            auto& model = states[Idx].second;
             if (model.transitions.empty())
             {
-                return buildState(
-                    idx + 1,
+                return buildState<Idx + 1>(
                     states,
                     builderInternal.exec(registeredActions.at(model.actionName))
                         .andGoToState(model.destinationTargetName.data()));
             }
             else
             {
-                return buildState(
-                    idx + 1,
+                return buildState<Idx + 1>(
                     states,
                     buildTransition(
                         1u,
