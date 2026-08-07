@@ -1,14 +1,42 @@
 #include "fsm/imports/JsonModelImporter.hpp"
 #include <nlohmann/json.hpp>
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(fsm::detail::FactoryFsmTransitionModel,
-    conditionName,
-    destinationTargetName);
+namespace fsm::detail {
+    void from_json(const nlohmann::json& j, FactoryFsmTransitionModel& model)
+    {
+        if (!j.contains("conditionName"))
+        {
+            throw fsm::Error("conditionName missing for transition of one of the states");
+        }
+        else if (!j.contains("destinationTargetName"))
+        {
+            throw fsm::Error("destinationTargetName missing for transition of one of the states");
+        }
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(fsm::detail::FactoryFsmStateModel,
-    transitions,
-    actionName,
-    destinationTargetName);
+        j["conditionName"].get_to(model.conditionName);
+        j["destinationTargetName"].get_to(model.destinationTargetName);
+    }
+
+    void from_json(const nlohmann::json& j, FactoryFsmStateModel& model)
+    {
+        if (j.contains("transitions"))
+        {
+            j["transitions"].get_to(model.transitions);
+        }
+        
+        if (!j.contains("actionName"))
+        {
+            throw fsm::Error("actionName is missing for one of the states");
+        }
+        else if (!j.contains("destinationTargetName"))
+        {
+            throw fsm::Error("destinationTargetName is missing for one of the states");
+        }
+
+        j["actionName"].get_to(model.actionName);
+        j["destinationTargetName"].get_to(model.destinationTargetName);
+    }
+}
 
 void from_json(const nlohmann::json& j, fsm::detail::FactoryFsmModel& model)
 {
@@ -42,7 +70,9 @@ std::expected<fsm::detail::FactoryFsmModel, fsm::Error> fsm::JsonModelImporter::
         return std::unexpected(e);
     }
 
-    if (model.entryStateName.empty())
+    if (model.version != 1)
+        return std::unexpected(fsm::Error("Version " + std::to_string(model.version) + " is not supported"));
+    else if (model.entryStateName.empty())
         return std::unexpected(fsm::Error("entryStateName is empty"));
     else if (model.states.empty())
         return std::unexpected(fsm::Error("states are empty"));
