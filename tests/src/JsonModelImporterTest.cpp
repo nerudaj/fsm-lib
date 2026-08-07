@@ -1,7 +1,8 @@
-#include "catch_amalgamated.hpp"
 #include "fsm/imports/JsonModelImporter.hpp"
+#include "catch_amalgamated.hpp"
 
-std::expected<fsm::detail::FactoryFsmModel, fsm::Error> loadModelFromString(const std::string& str)
+std::expected<fsm::detail::FactoryFsmModel, fsm::Error>
+loadModelFromString(const std::string& str)
 {
     auto&& sstream = std::stringstream(str);
     auto&& importer = fsm::JsonModelImporter(sstream);
@@ -56,9 +57,14 @@ TEST_CASE("Happy path", "[JsonModelImporter]")
 
         REQUIRE(model.states["Start"].transitions.size() == 2u);
         REQUIRE(model.states["Start"].transitions[0].conditionName == "isEof");
-        REQUIRE(model.states["Start"].transitions[0].destinationTargetName == "Eof");
-        REQUIRE(model.states["Start"].transitions[1].conditionName == "isComma");
-        REQUIRE(model.states["Start"].transitions[1].destinationTargetName == "Comma");
+        REQUIRE(
+            model.states["Start"].transitions[0].destinationTargetName
+            == "Eof");
+        REQUIRE(
+            model.states["Start"].transitions[1].conditionName == "isComma");
+        REQUIRE(
+            model.states["Start"].transitions[1].destinationTargetName
+            == "Comma");
         REQUIRE(model.states["Start"].actionName == "advanceChar");
         REQUIRE(model.states["Start"].destinationTargetName == "Start");
 
@@ -92,8 +98,7 @@ TEST_CASE("Validation failed", "[JsonModelImporter]")
         auto&& result = loadModelFromString(json);
         REQUIRE_FALSE(result);
         REQUIRE(containsSubstr(
-            result.error().what(),
-            "Model does not contain version"));
+            result.error().what(), "Model does not contain version"));
     }
 
     SECTION("Version mismatch")
@@ -113,8 +118,7 @@ TEST_CASE("Validation failed", "[JsonModelImporter]")
         auto&& result = loadModelFromString(json);
         REQUIRE_FALSE(result);
         REQUIRE(containsSubstr(
-            result.error().what(),
-            "Version 1000 is not supported"));
+            result.error().what(), "Version 1000 is not supported"));
     }
 
     SECTION("Entry state name not defined")
@@ -133,8 +137,7 @@ TEST_CASE("Validation failed", "[JsonModelImporter]")
         auto&& result = loadModelFromString(json);
         REQUIRE_FALSE(result);
         REQUIRE(containsSubstr(
-            result.error().what(),
-            "Model does not contain entryStateName"));
+            result.error().what(), "Model does not contain entryStateName"));
     }
 
     SECTION("Entry state is empty")
@@ -153,9 +156,8 @@ TEST_CASE("Validation failed", "[JsonModelImporter]")
 
         auto&& result = loadModelFromString(json);
         REQUIRE_FALSE(result);
-        REQUIRE(containsSubstr(
-            result.error().what(),
-            "entryStateName is empty"));
+        REQUIRE(
+            containsSubstr(result.error().what(), "entryStateName is empty"));
     }
 
     SECTION("Entry state is missing")
@@ -175,8 +177,7 @@ TEST_CASE("Validation failed", "[JsonModelImporter]")
         auto&& result = loadModelFromString(json);
         REQUIRE_FALSE(result);
         REQUIRE(containsSubstr(
-            result.error().what(),
-            "states are missing the entry state"));
+            result.error().what(), "states are missing the entry state"));
     }
 
     SECTION("States are missing")
@@ -189,8 +190,7 @@ TEST_CASE("Validation failed", "[JsonModelImporter]")
         auto&& result = loadModelFromString(json);
         REQUIRE_FALSE(result);
         REQUIRE(containsSubstr(
-            result.error().what(),
-            "Model does not contain states"));
+            result.error().what(), "Model does not contain states"));
     }
 
     SECTION("No states defined")
@@ -203,9 +203,7 @@ TEST_CASE("Validation failed", "[JsonModelImporter]")
 
         auto&& result = loadModelFromString(json);
         REQUIRE_FALSE(result);
-        REQUIRE(containsSubstr(
-            result.error().what(),
-            "states are empty"));
+        REQUIRE(containsSubstr(result.error().what(), "states are empty"));
     }
 
     SECTION("Condition is missing")
@@ -281,7 +279,8 @@ TEST_CASE("Validation failed", "[JsonModelImporter]")
         REQUIRE_FALSE(result);
         REQUIRE(containsSubstr(
             result.error().what(),
-            "destinationTargetName missing for transition of one of the states"));
+            "destinationTargetName missing for transition of one of the "
+            "states"));
     }
 
     SECTION("Destination for conditional transition is empty")
@@ -357,8 +356,7 @@ TEST_CASE("Validation failed", "[JsonModelImporter]")
         auto&& result = loadModelFromString(json);
         REQUIRE_FALSE(result);
         REQUIRE(containsSubstr(
-            result.error().what(),
-            "actionName of state Start is empty"));
+            result.error().what(), "actionName of state Start is empty"));
     }
 
     SECTION("Destination for default transition is missing")

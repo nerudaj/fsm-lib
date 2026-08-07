@@ -1,12 +1,26 @@
-#include "catch_amalgamated.hpp"
 #include "fsm/Factory.hpp"
-#include "CsvParser.hpp"
 #include "Blackboard.hpp"
+#include "CsvParser.hpp"
+#include "catch_amalgamated.hpp"
+#include "fsm/imports/JsonModelImporter.hpp"
 
 #define REGISTER_METHOD(x) #x, x
 
-/*
-TEST_CASE("[Factory]")
+static std::string getTrivialV1Json()
+{
+    return R"({
+    "version": 1,
+    "entryStateName": "Start",
+    "states": {
+        "Start": {
+            "actionName": "nothing",
+            "destinationTargetName": "Start"
+        }
+    }
+})";
+}
+
+TEST_CASE("Happy path", "[Factory]")
 {
     auto&& factory = fsm::Factory<Blackboard>();
 
@@ -21,10 +35,14 @@ TEST_CASE("[Factory]")
     factory.registerCondition(REGISTER_METHOD(isExclamationMark));
     factory.registerCondition(REGISTER_METHOD(alwaysTrue));
 
-    SECTION("Exports correct manifest.json")
+    SECTION("Loads trivial v1 model with single state with no transitions")
     {
-        // TODO: this should test another class
+        auto&& stream = std::stringstream(getTrivialV1Json());
+        auto&& importer = fsm::JsonModelImporter(stream);
+        auto&& fsm = factory.importFsm(importer);
+        Blackboard bb;
+        fsm.tick(bb);
     }
-}*/
+}
 
 #undef REGISTER_METHOD

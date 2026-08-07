@@ -133,24 +133,22 @@ namespace fsm::detail
          */
         auto thenGoToState(StateId stateName)
         {
-            return invokeSubmachine(
-                TransitionContext {
-                    .primary = createFullStateName(
-                        targetMachineName,
-                        context.machines.at(targetMachineName).entryState),
-                    .secondary = createFullStateName(
-                        context.currentlyBuiltMachine, stateName),
-                });
+            return invokeSubmachine(TransitionContext {
+                .primary = createFullStateName(
+                    targetMachineName,
+                    context.machines.at(targetMachineName).entryState),
+                .secondary = createFullStateName(
+                    context.currentlyBuiltMachine, stateName),
+            });
         }
 
         auto thenFinish()
         {
-            return invokeSubmachine(
-                TransitionContext {
-                    .primary = createFullStateName(
-                        targetMachineName,
-                        context.machines.at(targetMachineName).entryState),
-                });
+            return invokeSubmachine(TransitionContext {
+                .primary = createFullStateName(
+                    targetMachineName,
+                    context.machines.at(targetMachineName).entryState),
+            });
         }
 
     private:
@@ -216,11 +214,10 @@ namespace fsm::detail
                     "the current machine");
 
             if (!context.machines.contains(machineName))
-                throw Error(
-                    std::format(
-                        "Trying to go to machine called {} that is not "
-                        "defined yet",
-                        machineName.get()));
+                throw Error(std::format(
+                    "Trying to go to machine called {} that is not "
+                    "defined yet",
+                    machineName.get()));
 
             return MachineBackTransitionBuilder<BbT, IsSubmachine>(
                 std::move(context), machineName);
@@ -351,11 +348,10 @@ namespace fsm::detail
                     "the current machine");
 
             if (!context.machines.contains(machineName))
-                throw Error(
-                    std::format(
-                        "Trying to go to machine called {} that is not "
-                        "defined yet",
-                        machineName.get()));
+                throw Error(std::format(
+                    "Trying to go to machine called {} that is not "
+                    "defined yet",
+                    machineName.get()));
 
             return MachineBackTransitionBuilder<BbT, IsSubmachine, false>(
                 std::move(context), machineName, std::move(condition));
@@ -536,7 +532,7 @@ namespace fsm::detail
         {
         }
 
-        StateBuilder(StateBuilder&&) = delete;
+        StateBuilder(StateBuilder&&) = default; // ??? ok
 
         StateBuilder(const StateBuilder&) = delete;
 
@@ -675,10 +671,8 @@ namespace fsm::detail
         auto withSubmachine(MachineId name)
         {
             if (context.machines.contains(name))
-                throw Error(
-                    std::format(
-                        "Trying to redeclare machine with name {}",
-                        name.get()));
+                throw Error(std::format(
+                    "Trying to redeclare machine with name {}", name.get()));
 
             insertNewMachineIntoContext(name, context);
             return MachineBuilderPreEntryPoint<BbT, IsSubmachine, false>(

@@ -18,7 +18,7 @@ namespace fsm::detail
 
     public:
         // cppcheck-suppress noExplicitConstructor
-        consteval NonEmptyString(const CharT* str) noexcept : data(str)
+        constexpr NonEmptyString(const CharT* str) noexcept : data(str)
         {
             if (data.empty())
                 you_see_this_error_because_you_used_empty_string_in_fsm_builder();
