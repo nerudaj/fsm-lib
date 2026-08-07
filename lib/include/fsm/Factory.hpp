@@ -45,35 +45,50 @@ namespace fsm
             auto&& builder =
                 fsm::Builder<BbT>().withNoErrorMachine().withMainMachine();
 
-            return buildState(
-                       builder.withEntryState(model.entryStateName.data()),
-                       model.states.at(model.entryStateName))
-                .done()
-                .build();
+            auto states = stateMapToVector(model);
+
+            return buildState(0, states, builder).done().build();
         }
 
     private:
+        template<size_t Idx>
         auto buildState(
-            auto&& builder,
-            const fsm::detail::FactoryFsmStateModel& model) const
+            size_t idx,
+            const std::vector<
+                std::pair<std::string, fsm::detail::FactoryFsmStateModel>>&
+                states,
+            auto&& builder) const
         {
+            fsm::detail::StateBuilder<BbT, false, false> builderInternal =
+                idx == 0 ? builder.withEntryState(states[idx].first.data())
+                         : builder.withState(states[idx].first.data());
+
+            if (idx == states.size() - 1) return builder;
+
+            auto& model = states[idx].second;
             if (model.transitions.empty())
             {
-                return builder.exec(registeredActions.at(model.actionName))
-                    .andGoToState(model.destinationTargetName.data());
+                return buildState(
+                    idx + 1,
+                    states,
+                    builderInternal.exec(registeredActions.at(model.actionName))
+                        .andGoToState(model.destinationTargetName.data()));
             }
             else
             {
-                auto&& stateBuilder =
-                    builder
-                        .when(registeredConditions.at(
-                            model.transitions.front().conditionName))
-                        .goToState(model.transitions.front()
-                                       .destinationTargetName.data());
-
-                return buildTransition(1u, model.transitions, stateBuilder)
-                    .otherwiseExec(registeredActions.at(model.actionName))
-                    .andGoToState(model.destinationTargetName.data());
+                return buildState(
+                    idx + 1,
+                    states,
+                    buildTransition(
+                        1u,
+                        model.transitions,
+                        builderInternal
+                            .when(registeredConditions.at(
+                                model.transitions.front().conditionName))
+                            .goToState(model.transitions.front()
+                                           .destinationTargetName.data()))
+                        .otherwiseExec(registeredActions.at(model.actionName))
+                        .andGoToState(model.destinationTargetName.data()));
             }
         }
 
@@ -91,6 +106,30 @@ namespace fsm
 
             if (idx == model.size() - 1) return std::move(newBuilder);
             return std::move(buildTransition(idx + 1, model, newBuilder));
+        }
+
+        std::vector<std::pair<std::string, fsm::detail::FactoryFsmStateModel>>
+        stateMapToVector(const fsm::detail::FactoryFsmModel& model) const
+        {
+            auto&& vec = model.states
+                         | std::ranges::to<std::vector<std::pair<
+                             std::string,
+                             fsm::detail::FactoryFsmStateModel>>>();
+            assert(!vec.empty());
+
+            // make sure entry state is first
+            auto&& itr = std::ranges::find_if(
+                vec,
+                [&model](const std::pair<
+                         std::string,
+                         fsm::detail::FactoryFsmStateModel>& pair)
+                { return pair.first == model.entryStateName; });
+
+            auto&& idx = std::distance(itr, vec.begin());
+
+            std::swap(vec[0], vec[idx]);
+
+            return vec;
         }
 
     private:

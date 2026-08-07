@@ -20,6 +20,38 @@ static std::string getTrivialV1Json()
 })";
 }
 
+static std::string getV1WithTransitions()
+{
+    return R"({
+    "version": 1,
+    "entryStateName": "Start",
+    "states": {
+        "Start": {
+            "transitions": [
+                {
+                    "conditionName": "isEof",
+                    "destinationTargetName": "Eof"
+                },
+                {
+                    "conditionName": "isSeparatorChar",
+                    "destinationTargetName": "Comma"
+                }
+            ],
+            "actionName": "advanceChar",
+            "destinationTargetName": "Start"
+        },
+        "Eof": {
+            "actionName": "nothing",
+            "destinationTargetName": "Eof"
+        },
+        "Comma": {
+            "actionName": "storeWord",
+            "destinationTargetName": "Start"
+        }
+    }
+})";
+}
+
 TEST_CASE("Happy path", "[Factory]")
 {
     auto&& factory = fsm::Factory<Blackboard>();
@@ -41,6 +73,21 @@ TEST_CASE("Happy path", "[Factory]")
         auto&& importer = fsm::JsonModelImporter(stream);
         auto&& fsm = factory.importFsm(importer);
         Blackboard bb;
+        fsm.tick(bb);
+    }
+
+    SECTION("Loads trivial v1 with a bunch of transitions")
+    {
+        auto&& stream = std::stringstream(getV1WithTransitions());
+        auto&& importer = fsm::JsonModelImporter(stream);
+        auto&& fsm = factory.importFsm(importer);
+        auto&& bb = Blackboard {
+            .data = "acb,def",
+        };
+        fsm.tick(bb);
+        fsm.tick(bb);
+        fsm.tick(bb);
+        fsm.tick(bb);
         fsm.tick(bb);
     }
 }
