@@ -29,7 +29,8 @@
 			"name": "clang-debug",
 			"inherits": "clang-base",
 			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "Debug"
+				"CMAKE_BUILD_TYPE": "Debug",
+				"CMAKE_CXX_FLAGS": "-stdlib=libc++"
 			}
 		},
 		{

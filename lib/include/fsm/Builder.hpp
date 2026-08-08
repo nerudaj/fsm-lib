@@ -567,7 +567,7 @@ namespace fsm::detail
         {
         }
 
-        MachineBuilder(MachineBuilder&&) = delete;
+        MachineBuilder(MachineBuilder&&) = default; // TODO: ???
         MachineBuilder(const MachineBuilder&) = delete;
 
     public:

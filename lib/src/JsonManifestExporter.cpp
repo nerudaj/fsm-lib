@@ -1,5 +1,3 @@
-#pragma once
-
 #include "fsm/exports/JsonManifestExporter.hpp"
 #include <nlohmann/json.hpp>
 

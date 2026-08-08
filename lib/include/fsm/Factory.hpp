@@ -45,59 +45,67 @@ namespace fsm
             auto&& builder =
                 fsm::Builder<BbT>().withNoErrorMachine().withMainMachine();
 
-            auto states = stateMapToVector(model);
+            auto&& states = stateMapToVector(model);
 
-            return buildState<0>(states, builder).done().build();
+            return buildEntryStateThenAllOtherStates(states, builder)
+                .done()
+                .build();
         }
 
     private:
-        template<size_t Idx>
-        fsm::detail::MachineBuilder<BbT, false, false> buildState(
-            const std::vector<
-                std::pair<std::string, fsm::detail::FactoryFsmStateModel>>&
-                states,
+        using StateNameModelPair = std::pair<std::string, fsm::detail::FactoryFsmStateModel>;
+
+        fsm::detail::MachineBuilder<BbT, false, false> buildEntryStateThenAllOtherStates(
+            const std::vector<StateNameModelPair>& states,
             auto&& builder) const
         {
-            if (Idx == states.size() - 1) return builder;
+            return buildStates(
+                1u,
+                states,
+                buildState(
+                    states.front().second,
+                    builder.withEntryState(states.front().first.data())));
+        }
 
-            auto&& builderInternal = [&]()
-            {
-                if constexpr (Idx == 0)
-                {
-                    return builder.withEntryState(states[Idx].first.data());
-                }
-                else
-                {
-                    return builder.withState(states[Idx].first.data());
-                }
-            }();
+        fsm::detail::MachineBuilder<BbT, false, false> buildStates(
+            size_t idx,
+            const std::vector<StateNameModelPair>& states,
+            auto&& builder) const
+        {
+            if (idx == states.size() - 1) return std::move(builder);
 
-            auto& model = states[Idx].second;
+            return buildStates(
+                idx + 1,
+                states,
+                buildState(
+                    states[idx].second,
+                    builder.withState(states[idx].first.data())));
+        }
+
+        auto buildState(const fsm::detail::FactoryFsmStateModel& model, auto&& builder) const
+        {
             if (model.transitions.empty())
             {
-                return buildState<Idx + 1>(
-                    states,
-                    builderInternal.exec(registeredActions.at(model.actionName))
-                        .andGoToState(model.destinationTargetName.data()));
+                return builder
+                    .exec(registeredActions.at(model.actionName))
+                    .andGoToState(model.destinationTargetName.data());
             }
             else
             {
-                return buildState<Idx + 1>(
-                    states,
-                    buildTransition(
+                return buildTransitions(
                         1u,
                         model.transitions,
-                        builderInternal
+                        builder
                             .when(registeredConditions.at(
                                 model.transitions.front().conditionName))
                             .goToState(model.transitions.front()
-                                           .destinationTargetName.data()))
-                        .otherwiseExec(registeredActions.at(model.actionName))
-                        .andGoToState(model.destinationTargetName.data()));
+                                            .destinationTargetName.data()))
+                    .otherwiseExec(registeredActions.at(model.actionName))
+                    .andGoToState(model.destinationTargetName.data());
             }
         }
 
-        auto buildTransition(
+        auto buildTransitions(
             size_t idx,
             const std::vector<fsm::detail::FactoryFsmTransitionModel>& model,
             auto&& builder) const
@@ -110,10 +118,10 @@ namespace fsm
                     .goToState(model[idx].destinationTargetName.data());
 
             if (idx == model.size() - 1) return std::move(newBuilder);
-            return std::move(buildTransition(idx + 1, model, newBuilder));
+            return std::move(buildTransitions(idx + 1, model, newBuilder));
         }
 
-        std::vector<std::pair<std::string, fsm::detail::FactoryFsmStateModel>>
+        std::vector<StateNameModelPair>
         stateMapToVector(const fsm::detail::FactoryFsmModel& model) const
         {
             auto&& vec = model.states
