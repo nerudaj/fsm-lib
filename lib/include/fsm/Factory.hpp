@@ -46,7 +46,6 @@ namespace fsm
                 fsm::Builder<BbT>().withNoErrorMachine().withMainMachine();
 
             auto&& states = stateMapToVector(model);
-
             return buildEntryStateThenAllOtherStates(states, builder)
                 .done()
                 .build();
@@ -59,6 +58,7 @@ namespace fsm
             const std::vector<StateNameModelPair>& states,
             auto&& builder) const
         {
+            assert(!states.empty());
             return buildStates(
                 1u,
                 states,
@@ -72,7 +72,9 @@ namespace fsm
             const std::vector<StateNameModelPair>& states,
             auto&& builder) const
         {
-            if (idx == states.size() - 1) return std::move(builder);
+            if (idx == states.size()) return std::move(builder);
+
+            assert(0 <= idx && idx < states.size());
 
             return buildStates(
                 idx + 1,
@@ -86,12 +88,15 @@ namespace fsm
         {
             if (model.transitions.empty())
             {
+                assert(registeredActions.contains(model.actionName));
                 return builder
                     .exec(registeredActions.at(model.actionName))
                     .andGoToState(model.destinationTargetName.data());
             }
             else
             {
+                assert(registeredConditions.contains(model.transitions.front().conditionName));
+                assert(registeredActions.contains(model.actionName));
                 return buildTransitions(
                         1u,
                         model.transitions,
@@ -111,6 +116,8 @@ namespace fsm
             auto&& builder) const
         {
             assert(idx > 0);
+            assert(idx < model.size());
+            assert(registeredConditions.contains(model[idx].conditionName));
 
             auto&& newBuilder =
                 builder
@@ -128,7 +135,7 @@ namespace fsm
                          | std::ranges::to<std::vector<std::pair<
                              std::string,
                              fsm::detail::FactoryFsmStateModel>>>();
-            assert(!vec.empty());
+            assert(vec.size() == model.states.size());
 
             // make sure entry state is first
             auto&& itr = std::ranges::find_if(
@@ -138,7 +145,8 @@ namespace fsm
                          fsm::detail::FactoryFsmStateModel>& pair)
                 { return pair.first == model.entryStateName; });
 
-            auto&& idx = std::distance(itr, vec.begin());
+            auto&& idx = std::distance(vec.begin(), itr);
+            assert(0 <= idx && idx < vec.size());
 
             std::swap(vec[0], vec[idx]);
 
