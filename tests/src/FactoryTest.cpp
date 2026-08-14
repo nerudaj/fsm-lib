@@ -52,7 +52,7 @@ static std::string getV1WithTransitions()
 })";
 }
 
-TEST_CASE("Happy path", "[Factory]")
+static fsm::Factory<Blackboard> makeFactory()
 {
     auto&& factory = fsm::Factory<Blackboard>();
 
@@ -67,11 +67,19 @@ TEST_CASE("Happy path", "[Factory]")
     factory.registerCondition(REGISTER_METHOD(isExclamationMark));
     factory.registerCondition(REGISTER_METHOD(alwaysTrue));
 
+    return factory;
+}
+
+TEST_CASE("Happy path", "[Factory]")
+{
+    auto&& factory = makeFactory();
+
     SECTION("Loads trivial v1 model with single state with no transitions")
     {
         auto&& stream = std::stringstream(getTrivialV1Json());
         auto&& importer = fsm::JsonModelImporter(stream);
         auto&& fsm = factory.importFsm(importer);
+
         Blackboard bb;
         fsm.tick(bb);
     }
@@ -81,6 +89,7 @@ TEST_CASE("Happy path", "[Factory]")
         auto&& stream = std::stringstream(getV1WithTransitions());
         auto&& importer = fsm::JsonModelImporter(stream);
         auto&& fsm = factory.importFsm(importer);
+
         auto&& bb = Blackboard {
             .data = "acb,def",
         };
@@ -90,6 +99,17 @@ TEST_CASE("Happy path", "[Factory]")
         fsm.tick(bb);
         fsm.tick(bb);
     }
+}
+
+TEST_CASE("Validation fails", "[Factory]")
+{
+    auto&& factory = makeFactory();
+
+    SECTION("Model uses not registered action")
+    {}
+
+    SECTION("Model uses not registered condition")
+    {}
 }
 
 #undef REGISTER_METHOD
