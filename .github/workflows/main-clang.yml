@@ -25,6 +25,11 @@ jobs:
       with:
         cmake-version: '3.26.1'
 
+    - name: Install dependencies
+      if: matrix.platform == 'ubuntu-latest'
+      run: |
+        apt install libc++-dev
+
     - name: Check cmake version
       run: cmake --version
 
