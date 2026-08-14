@@ -1,59 +1,96 @@
 {
-    "version": 10,
-    "cmakeMinimumRequired": {
-        "major": 3,
-        "minor": 28,
-        "patch": 0
-    },
-    "configurePresets": [
-        {
-            "name": "base",
-            "hidden": true,
-            "cacheVariables": {
-                "CMAKE_CXX_STANDARD": "23",
-                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
-                "CMAKE_CXX_EXTENSIONS": "OFF"
-            }
-        },
-        {
-            "name": "clang-base",
-            "hidden": true,
-            "inherits": "base",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/_build-${presetName}",
-            "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "clang++-18"
-            }
-        },
-        {
-            "name": "clang-debug",
-            "inherits": "clang-base",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
-        },
-        {
-            "name": "clang-release",
-            "inherits": "clang-base",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        }
-    ],
-    "buildPresets": [
-        {
-            "name": "clang-debug-build",
-            "configurePreset": "clang-debug",
-            "targets": [
-                "all"
-            ]
-        },
-        {
-            "name": "clang-release-build",
-            "configurePreset": "clang-release",
-            "targets": [
-                "all"
-            ]
-        }
-    ]
+	"version": 9,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 28,
+		"patch": 0
+	},
+	"configurePresets": [
+		{
+			"name": "base",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CXX_STANDARD": "23",
+				"CMAKE_CXX_STANDARD_REQUIRED": "ON",
+				"CMAKE_CXX_EXTENSIONS": "OFF"
+			}
+		},
+		{
+			"name": "clang-base",
+			"hidden": true,
+			"inherits": "base",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/_build-${presetName}",
+			"cacheVariables": {
+				"CMAKE_CXX_COMPILER": "clang++-18"
+			}
+		},
+		{
+			"name": "clang-debug",
+			"inherits": "clang-base",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"CMAKE_CXX_FLAGS": "-stdlib=libc++"
+			}
+		},
+		{
+			"name": "clang-release",
+			"inherits": "clang-base",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		},
+		{
+			"name": "msvc-17",
+			"inherits": "base",
+			"displayName": "MSVC - Visual Studio generator (MSBuild)",
+			"description": "Configure using Visual Studio generator (selects MSBuild).",
+			"generator": "Visual Studio 17 2022",
+			"binaryDir": "${sourceDir}/_build",
+			"cacheVariables": {
+				"CMAKE_GENERATOR_PLATFORM": "x64"
+			}
+		},
+		{
+			"name": "Custom configure preset",
+			"displayName": "Custom configure preset",
+			"description": "Sets Ninja generator, build and install directory",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "clang-debug-build",
+			"configurePreset": "clang-debug",
+			"targets": [
+				"all"
+			]
+		},
+		{
+			"name": "clang-release-build",
+			"configurePreset": "clang-release",
+			"targets": [
+				"all"
+			]
+		},
+		{
+			"name": "build-msvc-17-debug",
+			"displayName": "Build (MSVC Debug)",
+			"configurePreset": "msvc-17",
+			"configuration": "Debug",
+			"jobs": 4
+		},
+		{
+			"name": "build-msvc-17-release",
+			"displayName": "Build (MSVC Release)",
+			"configurePreset": "msvc-17",
+			"configuration": "Release",
+			"jobs": 4
+		}
+	]
 }

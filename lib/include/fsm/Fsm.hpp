@@ -7,6 +7,7 @@
 #include <fsm/detail/BuilderContext.hpp>
 #include <fsm/detail/Compiler.hpp>
 #include <fsm/detail/Helper.hpp>
+#include <fsm/detail/SemiOwningWrapper.hpp>
 #include <fsm/detail/StateIndex.hpp>
 #include <fsm/logging/LoggerInterface.hpp>
 #include <fsm/logging/NullLogger.hpp>
@@ -54,19 +55,13 @@ namespace fsm
         {
         }
 
-        /* NOTE:
-        Cannot define copy/move constructors because if the class uses the
-        defaultLogger, the logger reference wrapper points to a wrong location
-        after move. And if the logger was set to something outside of this class,
-        the reference wrapper would stay ok. There is no way of telling.
-        */
-        Fsm(Fsm&&) = delete;
+        Fsm(Fsm&&) = default;
         Fsm(const Fsm&) = delete;
 
     public:
         void setLogger(LoggerInterface& _logger)
         {
-            logger = _logger;
+            logger.set(_logger);
         }
 
         /**
@@ -236,8 +231,7 @@ namespace fsm
         }
 
     private:
-        NullLogger defaultLogger = NullLogger();
-        std::reference_wrapper<LoggerInterface> logger = defaultLogger;
+        SemiOwningWrapper<LoggerInterface, NullLogger> logger;
         std::vector<std::string> stateIdToName;
         std::vector<detail::CompiledState<BbT>> states;
         size_t errorStateEndIdx = 0;
