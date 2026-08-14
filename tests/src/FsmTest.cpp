@@ -233,4 +233,38 @@ TEST_CASE("[FSM]")
         machine.tick(bb);
         REQUIRE(bb.__stateIdxs.back() == 4u); // __main__:End
     }
+
+    SECTION("FSM is movable")
+    {
+        // clang-format off
+        auto&& machine = fsm::Builder<Blackboard>()
+        .withNoErrorMachine()
+        .withMainMachine()
+            .withEntryState("Start")
+                .exec(nothing).andFinish()
+            .done()
+        .build();
+        // clang-format on
+
+        SECTION("With default logger")
+        {
+            auto&& fsm = std::move(machine);
+
+            REQUIRE_FALSE(fsm.isFinished(bb));
+            fsm.tick(bb);
+            REQUIRE(fsm.isFinished(bb));
+        }
+
+        SECTION("With custom logger")
+        {
+            auto&& customLogger = fsm::CsvLogger(std::cout);
+
+            machine.setLogger(customLogger);
+            auto&& fsm = std::move(machine);
+
+            REQUIRE_FALSE(fsm.isFinished(bb));
+            fsm.tick(bb);
+            REQUIRE(fsm.isFinished(bb));
+        }
+    }
 }
