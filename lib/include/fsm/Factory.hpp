@@ -42,8 +42,15 @@ namespace fsm
 
             assert(model.version == 1);
 
-            auto&& builder =
-                fsm::Builder<BbT>().withNoErrorMachine().withMainMachine();
+            // clang-format off
+            auto&& builder = fsm::Builder<BbT>()
+                .withErrorMachine()
+                .noGlobalEntryCondition()
+                    .withEntryState("Start")
+                        .exec([](BbT&) {}).andLoop()
+                    .done()
+                .withMainMachine();
+            // clang-format on
 
             auto&& states = stateMapToVector(model);
             return buildEntryStateThenAllOtherStates(states, builder)
@@ -52,11 +59,12 @@ namespace fsm
         }
 
     private:
-        using StateNameModelPair = std::pair<std::string, fsm::detail::FactoryFsmStateModel>;
+        using StateNameModelPair =
+            std::pair<std::string, fsm::detail::FactoryFsmStateModel>;
 
-        fsm::detail::MachineBuilder<BbT, false, false> buildEntryStateThenAllOtherStates(
-            const std::vector<StateNameModelPair>& states,
-            auto&& builder) const
+        fsm::detail::MachineBuilder<BbT, false, false>
+        buildEntryStateThenAllOtherStates(
+            const std::vector<StateNameModelPair>& states, auto&& builder) const
         {
             assert(!states.empty());
             return buildStates(
@@ -84,29 +92,28 @@ namespace fsm
                     builder.withState(states[idx].first.data())));
         }
 
-        auto buildState(const fsm::detail::FactoryFsmStateModel& model, auto&& builder) const
+        auto buildState(
+            const fsm::detail::FactoryFsmStateModel& model,
+            auto&& builder) const
         {
+            assert(registeredActions.contains(model.actionName));
+
             if (model.transitions.empty())
             {
-                assert(registeredActions.contains(model.actionName));
-                return builder
-                    .exec(registeredActions.at(model.actionName))
-                    .andGoToState(model.destinationTargetName.data());
+                return buildDefaultDestination(
+                    model.destinationTargetName,
+                    builder.exec(registeredActions.at(model.actionName)));
             }
             else
             {
-                assert(registeredConditions.contains(model.transitions.front().conditionName));
-                assert(registeredActions.contains(model.actionName));
-                return buildTransitions(
+                return buildDefaultDestination(
+                    model.destinationTargetName,
+                    buildTransitions(
                         1u,
                         model.transitions,
-                        builder
-                            .when(registeredConditions.at(
-                                model.transitions.front().conditionName))
-                            .goToState(model.transitions.front()
-                                            .destinationTargetName.data()))
-                    .otherwiseExec(registeredActions.at(model.actionName))
-                    .andGoToState(model.destinationTargetName.data());
+                        buildFirstTransition(
+                            model.transitions.front(), builder))
+                        .otherwiseExec(registeredActions.at(model.actionName)));
             }
         }
 
@@ -116,16 +123,55 @@ namespace fsm
             auto&& builder) const
         {
             assert(idx > 0);
-            assert(idx < model.size());
-            assert(registeredConditions.contains(model[idx].conditionName));
+            assert(idx <= model.size());
 
-            auto&& newBuilder =
-                builder
-                    .orWhen(registeredConditions.at(model[idx].conditionName))
-                    .goToState(model[idx].destinationTargetName.data());
+            if (idx == model.size()) return builder;
+            return buildTransitions(
+                idx + 1, model, buildNthTransition(model[idx], builder));
+        }
 
-            if (idx == model.size() - 1) return std::move(newBuilder);
-            return std::move(buildTransitions(idx + 1, model, newBuilder));
+        auto buildFirstTransition(
+            const fsm::detail::FactoryFsmTransitionModel& transition,
+            auto&& builder) const
+        {
+            assert(registeredConditions.contains(transition.conditionName));
+
+            return buildDestination(
+                transition.destinationTargetName,
+                builder.when(
+                    registeredConditions.at(transition.conditionName)));
+        }
+
+        auto buildNthTransition(
+            const fsm::detail::FactoryFsmTransitionModel& transition,
+            auto&& builder) const
+        {
+            assert(registeredConditions.contains(transition.conditionName));
+
+            return buildDestination(
+                transition.destinationTargetName,
+                builder.orWhen(
+                    registeredConditions.at(transition.conditionName)));
+        }
+
+        auto buildDefaultDestination(
+            const std::string& targetName, auto&& builder) const
+        {
+            if (targetName == "__error__")
+                throw fsm::Error("Cannot error out from a default transition");
+            else if (targetName == "__finish__")
+                return builder.andFinish();
+            return builder.andGoToState(targetName.data());
+        }
+
+        auto
+        buildDestination(const std::string& targetName, auto&& builder) const
+        {
+            if (targetName == "__error__")
+                return builder.error();
+            else if (targetName == "__finish__")
+                return builder.finish();
+            return builder.goToState(targetName.data());
         }
 
         std::vector<StateNameModelPair>

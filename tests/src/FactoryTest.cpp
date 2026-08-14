@@ -52,6 +52,40 @@ static std::string getV1WithTransitions()
 })";
 }
 
+static std::string getJsonWithError()
+{
+    return R"({
+    "version": 1,
+    "entryStateName": "Start",
+    "states": {
+        "Start": {
+            "transitions": [
+                {
+                    "conditionName": "alwaysTrue",
+                    "destinationTargetName": "__error__"
+                }
+            ],
+            "actionName": "nothing",
+            "destinationTargetName": "Start"
+        }
+    }
+})";
+}
+
+static std::string getJsonWithFinish()
+{
+    return R"({
+    "version": 1,
+    "entryStateName": "Start",
+    "states": {
+        "Start": {
+            "actionName": "nothing",
+            "destinationTargetName": "__finish__"
+        }
+    }
+})";
+}
+
 static fsm::Factory<Blackboard> makeFactory()
 {
     auto&& factory = fsm::Factory<Blackboard>();
@@ -99,17 +133,41 @@ TEST_CASE("Happy path", "[Factory]")
         fsm.tick(bb);
         fsm.tick(bb);
     }
+
+    SECTION("Supports basic error() into NOP error machine")
+    {
+        auto&& stream = std::stringstream(getJsonWithError());
+        auto&& importer = fsm::JsonModelImporter(stream);
+        auto&& fsm = factory.importFsm(importer);
+
+        Blackboard bb;
+        REQUIRE_FALSE(fsm.isErrored(bb));
+        fsm.tick(bb);
+        REQUIRE(fsm.isErrored(bb));
+    }
+
+    SECTION("Supports finish()")
+    {
+        auto&& stream = std::stringstream(getJsonWithFinish());
+        auto&& importer = fsm::JsonModelImporter(stream);
+        auto&& fsm = factory.importFsm(importer);
+
+        Blackboard bb;
+        REQUIRE_FALSE(fsm.isFinished(bb));
+        fsm.tick(bb);
+        REQUIRE(fsm.isFinished(bb));
+    }
 }
 
 TEST_CASE("Validation fails", "[Factory]")
 {
     auto&& factory = makeFactory();
 
-    SECTION("Model uses not registered action")
-    {}
+    SECTION("Model uses not registered action") {}
 
-    SECTION("Model uses not registered condition")
-    {}
+    SECTION("Model uses not registered condition") {}
+
+    SECTION("Cannot error-out from default transition") {}
 }
 
 #undef REGISTER_METHOD
