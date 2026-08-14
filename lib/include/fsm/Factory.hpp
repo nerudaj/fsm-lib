@@ -4,6 +4,7 @@
 #include "fsm/Types.hpp"
 #include "fsm/exports/ManifestExporterInterface.hpp"
 #include "fsm/imports/ModelImporterInterface.hpp"
+#include <expected>
 
 namespace fsm
 {
@@ -35,12 +36,21 @@ namespace fsm
                     | std::ranges::to<std::vector>());
         }
 
-        fsm::Fsm<BbT> importFsm(ModelImporterInterface& modelImporter) const
+        std::expected<fsm::Fsm<BbT>, fsm::Error>
+        importFsm(ModelImporterInterface& modelImporter) const
         {
             auto&& modelResult = modelImporter.loadModel();
+            if (!modelResult)
+                return std::unexpected(fsm::Error(
+                    std::string("Could not load the model:\n")
+                    + modelResult.error().what()));
+
             auto&& model = modelResult.value();
 
-            assert(model.version == 1);
+            if (model.version != 1)
+                return std::unexpected(fsm::Error(
+                    "Unsupported model version: "
+                    + std::to_string(model.version)));
 
             // clang-format off
             auto&& builder = fsm::Builder<BbT>()
@@ -53,9 +63,18 @@ namespace fsm
             // clang-format on
 
             auto&& states = stateMapToVector(model);
-            return buildEntryStateThenAllOtherStates(states, builder)
-                .done()
-                .build();
+
+            try
+            {
+                return buildEntryStateThenAllOtherStates(states, builder)
+                    .done()
+                    .build();
+            }
+            catch (const std::exception& e)
+            {
+                return std::unexpected(fsm::Error(
+                    std::string("Could not construct the FSM:\n") + e.what()));
+            }
         }
 
     private:
@@ -80,7 +99,7 @@ namespace fsm
             const std::vector<StateNameModelPair>& states,
             auto&& builder) const
         {
-            if (idx == states.size()) return std::move(builder);
+            if (idx == states.size()) return builder;
 
             assert(0 <= idx && idx < states.size());
 
@@ -96,7 +115,13 @@ namespace fsm
             const fsm::detail::FactoryFsmStateModel& model,
             auto&& builder) const
         {
-            assert(registeredActions.contains(model.actionName));
+            if (!registeredActions.contains(model.actionName))
+            {
+                throw fsm::Error(std::format(
+                    "Model is referencing action called '{}', which was not "
+                    "registered",
+                    model.actionName));
+            }
 
             if (model.transitions.empty())
             {
@@ -134,7 +159,13 @@ namespace fsm
             const fsm::detail::FactoryFsmTransitionModel& transition,
             auto&& builder) const
         {
-            assert(registeredConditions.contains(transition.conditionName));
+            if (!registeredConditions.contains(transition.conditionName))
+            {
+                throw fsm::Error(std::format(
+                    "Model is referencing condition called '{}', which was not "
+                    "registered",
+                    transition.conditionName));
+            }
 
             return buildDestination(
                 transition.destinationTargetName,
@@ -146,7 +177,13 @@ namespace fsm
             const fsm::detail::FactoryFsmTransitionModel& transition,
             auto&& builder) const
         {
-            assert(registeredConditions.contains(transition.conditionName));
+            if (!registeredConditions.contains(transition.conditionName))
+            {
+                throw fsm::Error(std::format(
+                    "Model is referencing condition called '{}', which was not "
+                    "registered",
+                    transition.conditionName));
+            }
 
             return buildDestination(
                 transition.destinationTargetName,
