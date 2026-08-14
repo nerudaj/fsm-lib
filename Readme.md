@@ -9,6 +9,10 @@ This is a C++23 library for creating hierarchical finite state machines, with th
 
 While FSMs are quite simple structures to implement, the code usually quickly devolves into a spaghetti mess. This library enforces one particular paradigm to how FSM should look like so the code can stay consistent and hopefully clean.
 
+## AI Contribution Policy
+
+AI-generated contributions are prohibited, because other OSS projects could lose their collective minds if they ever wanted to depend on this project.
+
 ## Table of contents
 
  * [Concepts](#concepts)
