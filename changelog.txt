@@ -1,5 +1,8 @@
 fsm-lib v2.x.x changelog:
  - Added CMakePresets.json for better integration with VS Code
+ - Added `fsm::Factory` which allows loading models from JSON format
+	- This is a preparation for a Designer application
+	- Does not support submachines and customizable error machines at the moment
  - `fsm::Fsm` is now movable
 
 fsm-cpp v2.1.1 changelog:
