@@ -90,7 +90,8 @@ int main()
     // methods
     auto&& sstream = std::stringstream(fsmJson);
     auto&& importer = fsm::JsonModelImporter(sstream);
-    auto&& machine = factory.importFsm(importer);
+    auto&& result = factory.importFsm(importer);
+    auto&& machine = std::move(result.value());
 
     std::println("");
 
