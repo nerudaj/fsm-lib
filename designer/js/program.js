@@ -197,6 +197,9 @@ class Program {
         const stateName = node.id();
         this.selectedState = stateName;
 
+        const modal = new bootstrap.Modal(document.getElementById('stateInspectorModal'));
+        modal.show();
+
         this.bootstrapStateEditForm(
             /* enabled */ true,
             this.getCurrentStates()[stateName].name,

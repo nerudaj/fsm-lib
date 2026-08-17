@@ -63,65 +63,86 @@
     <div class="container-fluid">
         <div class="row">
             <!-- EDIT STATE SIDEBAR -->
-            <nav class="col-md-3 col-lg-2 d-md-block bg-body-tertiary sidebar">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li>
-                            <h5 class="center-text">State inspector</h5>
-                        </li>
+            <div class="modal fade" id="stateInspectorModal" tabindex="-1" aria-labelledby="stateInspectorModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                    <div class="modal-content">
 
-                        <li>
-                            <label for="EditState_NameInput" class="form-label">State name</label>
-                            <input type="text" class="form-control" id="EditState_NameInput" disabled
-                                onchange="onEditStateNameChange(event);">
-                        </li>
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="stateInspectorModalLabel">State inspector</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
 
-                        <li>
-                            <hr>
-                        </li>
+                        <div class="modal-body">
+                            <div class="pt-1">
+                                <ul class="nav flex-column">
 
-                        <li>
-                            <h6>Transitions</h6>
-                        </li>
+                                    <li>
+                                        <!-- title moved to modal-header -->
+                                        <div class="text-muted mb-2 d-none"></div>
+                                    </li>
 
-                        <li>
-                            <ul class="list-group" id="EditState_TransitionList">
-                            </ul>
-                        </li>
+                                    <li class="mb-3">
+                                        <label for="EditState_NameInput" class="form-label">State name</label>
+                                        <input type="text" class="form-control" id="EditState_NameInput" disabled
+                                            onchange="onEditStateNameChange(event);">
+                                    </li>
 
-                        <li>
-                            <button class="btn btn-secondary w-100" onclick="openAddTransitionModal(-1);" disabled
-                                id="EditState_AddTransitionButton">+</button>
-                        </li>
+                                    <li>
+                                        <hr>
+                                    </li>
 
-                        <li>
-                            <hr>
-                        </li>
+                                    <li class="mb-2">
+                                        <h6 class="mb-2">Transitions</h6>
 
-                        <li>
-                            <h6>Default behavior</h6>
-                        </li>
+                                        <ul class="list-group" id="EditState_TransitionList">
+                                        </ul>
+                                    </li>
 
-                        <li>
-                            <label for="EditState_ActionSelect" class="form-label">Action</label>
-                            <select class="form-select" id="EditState_ActionSelect" disabled
-                                onchange="onEditStateActionChange(event);">
-                            </select>
-                        </li>
+                                    <li class="mt-2">
+                                        <button class="btn btn-secondary w-100" onclick="openAddTransitionModal(-1);"
+                                            disabled id="EditState_AddTransitionButton">+</button>
+                                    </li>
 
-                        <li>
-                            <label for="EditState_DestinationSelect" class="form-label">Transition to</label>
-                            <select class="form-select" id="EditState_DestinationSelect" disabled
-                                onchange="onEditStateDestinationSelect(event);">
-                            </select>
-                        </li>
+                                    <li class="mt-3">
+                                        <hr>
+                                    </li>
 
-                        <li>
-                            <hr>
-                        </li>
-                    </ul>
+                                    <li class="mb-2">
+                                        <h6 class="mb-2">Default behavior</h6>
+                                    </li>
+
+                                    <li class="mb-3">
+                                        <label for="EditState_ActionSelect" class="form-label">Action</label>
+                                        <select class="form-select" id="EditState_ActionSelect" disabled
+                                            onchange="onEditStateActionChange(event);">
+                                        </select>
+                                    </li>
+
+                                    <li class="mb-3">
+                                        <label for="EditState_DestinationSelect" class="form-label">Transition
+                                            to</label>
+                                        <select class="form-select" id="EditState_DestinationSelect" disabled
+                                            onchange="onEditStateDestinationSelect(event);">
+                                        </select>
+                                    </li>
+
+                                    <li>
+                                        <hr>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
                 </div>
-            </nav>
+            </div>
 
             <!-- MAIN CONTENT -->
             <main class="col-md-9 col-lg-10 px-md-4">
