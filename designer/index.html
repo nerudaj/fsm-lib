@@ -84,7 +84,7 @@
 
                                     <li class="mb-3">
                                         <label for="EditState_NameInput" class="form-label">State name</label>
-                                        <input type="text" class="form-control" id="EditState_NameInput" disabled
+                                        <input type="text" class="form-control" id="EditState_NameInput"
                                             onchange="onEditStateNameChange(event);">
                                     </li>
 
@@ -100,8 +100,8 @@
                                     </li>
 
                                     <li class="mt-2">
-                                        <button class="btn btn-secondary w-100" onclick="openAddTransitionModal(-1);"
-                                            disabled id="EditState_AddTransitionButton">+</button>
+                                        <button class="btn btn-secondary w-100" onclick="addTransitionSelection();"
+                                            id="EditState_AddTransitionButton">+</button>
                                     </li>
 
                                     <li class="mt-3">
@@ -113,18 +113,22 @@
                                     </li>
 
                                     <li class="mb-3">
-                                        <label for="EditState_ActionSelect" class="form-label">Action</label>
-                                        <select class="form-select" id="EditState_ActionSelect" disabled
-                                            onchange="onEditStateActionChange(event);">
-                                        </select>
-                                    </li>
+                                        <div class="row g-3">
+                                            <div class="col-12 col-md-6">
+                                                <label for="EditState_ActionSelect" class="form-label">Action</label>
+                                                <select class="form-select" id="EditState_ActionSelect"
+                                                    onchange="onEditStateActionChange(event);">
+                                                </select>
+                                            </div>
 
-                                    <li class="mb-3">
-                                        <label for="EditState_DestinationSelect" class="form-label">Transition
-                                            to</label>
-                                        <select class="form-select" id="EditState_DestinationSelect" disabled
-                                            onchange="onEditStateDestinationSelect(event);">
-                                        </select>
+                                            <div class="col-12 col-md-6">
+                                                <label for="EditState_DestinationSelect" class="form-label">Transition
+                                                    to</label>
+                                                <select class="form-select" id="EditState_DestinationSelect"
+                                                    onchange="onEditStateDestinationSelect(event);">
+                                                </select>
+                                            </div>
+                                        </div>
                                     </li>
 
                                     <li>
@@ -136,6 +140,8 @@
                         </div>
 
                         <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Apply</button>
+
                             <button type="button" class="btn btn-outline-secondary"
                                 data-bs-dismiss="modal">Close</button>
                         </div>
