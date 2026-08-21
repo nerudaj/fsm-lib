@@ -39,3 +39,14 @@ function FsmModel(obj) {
     this.entryStateName = obj.entryStateName;
     this.states = obj.states;
 }
+
+function FsmFormStateModel() {
+    /** @type {string} */
+    this.stateName = "";
+    /** @type {FsmTransitionModel[]} */
+    this.transitions = [];
+    /** @type {string} */
+    this.actionName = "";
+    /** @type {string} */
+    this.destinationTargetName = "";
+}

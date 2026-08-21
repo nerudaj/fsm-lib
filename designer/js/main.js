@@ -143,6 +143,9 @@ function addTransitionSelection() {
 
     var placeholders = ["Placeholder 1", "Placeholder 2", "Placeholder 3"];
 
+    // TODO: redo as this
+    // DomHelper.populateSelectElement(selTo.id, placeholders);
+
     placeholders.forEach((txt, idx) => {
         var opt1 = document.createElement("option");
         opt1.value = "from_" + idx;
@@ -225,6 +228,12 @@ function onEditStateDestinationSelect(event) {
     }
 
     program.onSelectedStateDestinationChange(event.target.value);
+}
+
+function applyChangesToState() {
+    if (program) {
+        console.log(program.readEditStateModal());
+    }
 }
 
 /**

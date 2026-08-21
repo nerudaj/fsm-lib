@@ -345,4 +345,30 @@ class Program {
 
         this.ir = JSON.parse(nextState);
     }
+
+    /**
+     * @returns {FsmFormStateModel}
+     */
+    readEditStateModal() {
+        var result = new FsmFormStateModel();
+
+        result.stateName = DomHelper.readTextInput("EditState_NameInput");
+        result.actionName = DomHelper.readSelectInput("EditState_ActionSelect");
+        result.destinationTargetName = DomHelper.readSelectInput("EditState_DestinationSelect");
+
+        DomHelper.iterateUlChildren("EditState_TransitionList", (element) => {
+            var selects = element.getElementsByTagName("select");
+
+            if (selects.length !== 2) {
+                throw new Error(`There are not exactly two <select>s in the <li> element`);
+            }
+
+            result.transitions.push(new FsmTransitionModel(
+                DomHelper.readSelectInput(selects[0].id),
+                DomHelper.readSelectInput(selects[1].id)
+            ));
+        });
+
+        return result;
+    }
 }
