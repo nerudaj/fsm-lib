@@ -105,6 +105,26 @@ class CytoscapeHelper {
     }
 
     /**
+     * @param {cytoscape} graph The graph to repopulate
+     * @param {GraphMachineIR} machine Machine whose states are drawn
+     */
+    static rebuildGraph(graph, machine) {
+        graph.elements().remove();
+
+        const states = Object.values(machine.states);
+
+        graph.add(states.map((state) => ({
+            group: "nodes",
+            data: { id: state.id, label: `${state.name} (${state.actionName})` },
+            position: { x: state.x, y: state.y }
+        })));
+
+        for (const state of states) {
+            CytoscapeHelper.rebuildStateEdges(graph, state.id, state);
+        }
+    }
+
+    /**
      * @param {cytoscape} graph The graph the node lives in
      * @param {string} nodeId ID of the node whose edges are rebuilt
      * @param {GraphStateIR} state Model of the state the node maps to

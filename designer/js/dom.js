@@ -71,4 +71,21 @@ class DomHelper {
             }
         }
     }
+
+    /**
+     * @param {string} fileName
+     * @param {string} text
+     * @param {string} mimeType
+     */
+    static downloadTextFile(fileName, text, mimeType) {
+        const url = URL.createObjectURL(new Blob([text], { type: mimeType }));
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        a.click();
+
+        // Revoking synchronously can cancel a download that has not started.
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
 }

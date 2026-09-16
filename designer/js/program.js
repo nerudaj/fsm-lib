@@ -6,6 +6,9 @@ class Program {
         /** @type {string|null} */
         this.selectedState = null;
 
+        /** @type {string} */
+        this.modelFileName = "project.json";
+
         /** @type {cytoscape} */
         this.graph = CytoscapeHelper.createDefaultGraph();
         this.graph.on("tap", /** @param {any} evt */(evt) => {
@@ -22,8 +25,7 @@ class Program {
 
         });
 
-        /** @type {ProgramHistory} */
-        this.history = new ProgramHistory();
+        this.resetHistory();
 
         this.initTransitionListSorting();
     }
@@ -97,15 +99,18 @@ class Program {
                 this.log(`Parsed JSON: ${manifest}`);
                 this.ir.manifest = new ManifestModel(manifest);
 
-                // Update modals
-                var select = document.getElementById("AddState_ActionInput");
-                if (select && select instanceof HTMLSelectElement) {
-                    this.updateActionNameSelect(select);
-                }
+                this.updateAddStateModal();
             })
             .catch((error) => {
                 console.error("Failed to parse manifest JSON:", error);
             });
+    }
+
+    updateAddStateModal() {
+        const select = document.getElementById("AddState_ActionInput");
+        if (select && select instanceof HTMLSelectElement) {
+            this.updateActionNameSelect(select);
+        }
     }
 
     /**
@@ -114,30 +119,57 @@ class Program {
     loadModelFromFile(file) {
         file.text()
             .then((jsonText) => {
-                const model = JSON.parse(jsonText);
                 this.log(`Selected file: ${file.name}`);
-                this.log(`Parsed JSON: ${model}`);
-                this.fsm = new FsmModel(model);
+                this.ir = GraphIR.fromJSON(JSON.parse(jsonText));
+                this.modelFileName = file.name;
+
+                this.resetHistory();
+                this.restoreFromIr();
             })
             .catch((error) => {
-                console.error("Failed to parse FSM model JSON:", error);
+                console.error("Failed to load project:", error);
             });
     }
 
     /**
-     * @param {File} file 
+     * Redraws everything that is derived from the IR.
      */
-    saveModelToFile(file) {
-        const jsonText = JSON.stringify(this.fsm, null, 2);
-        const blob = new Blob([jsonText], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
+    restoreFromIr() {
+        this.onNodeUnselected();
+        this.updateAddStateModal();
+        CytoscapeHelper.rebuildGraph(this.graph, this.ir.getCurrentMachine());
+    }
 
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = file.name;
-        a.click();
+    async saveModelToFile() {
+        const jsonText = JSON.stringify(this.ir, null, 2);
 
-        URL.revokeObjectURL(url);
+        if (typeof window.showSaveFilePicker === "function") {
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: this.modelFileName,
+                    types: [{
+                        description: "FSM model",
+                        accept: { "application/json": [".json"] }
+                    }]
+                });
+
+                const writable = await handle.createWritable();
+                await writable.write(jsonText);
+                await writable.close();
+
+                this.modelFileName = handle.name;
+                return;
+            }
+            catch (error) {
+                if (error instanceof DOMException && error.name === "AbortError") {
+                    return;
+                }
+
+                console.error("Save dialog failed, falling back to download:", error);
+            }
+        }
+
+        DomHelper.downloadTextFile(this.modelFileName, jsonText, "application/json");
     }
 
     /**
@@ -207,7 +239,10 @@ class Program {
         const x = node.position().x;
         const y = node.position().y;
         this.log(`Updating position of ${id} to [${x}, ${y}]`);
-        this.ir.updateStatePosition(id, x, y);
+
+        this.executeAndSnapshot(() => {
+            this.ir.updateStatePosition(id, x, y);
+        });
     }
 
     /** 
@@ -217,15 +252,23 @@ class Program {
     addNewState(stateName, actionName) {
         this.log(`Adding state ${stateName} with action ${actionName}`);
 
-        const id = this.ir.getNewStateId();
-        this.getCurrentStates()[id] = new GraphStateIR(
-            id,
-            stateName,
-            actionName);
+        // Cytoscape would otherwise place the node somewhere the IR cannot
+        // see, and the position would be lost on save.
+        const index = Object.keys(this.getCurrentStates()).length;
+        const state = new GraphStateIR("", stateName, actionName);
+        state.x = 100 + (index % 4) * 250;
+        state.y = 100 + Math.floor(index / 4) * 150;
 
-        this.graph.add([
-            { group: 'nodes', data: { id: id, label: `${stateName} (${actionName})` } },
-        ]);
+        this.executeAndSnapshot(() => {
+            state.id = this.ir.getNewStateId();
+            this.getCurrentStates()[state.id] = state;
+        });
+
+        this.graph.add([{
+            group: "nodes",
+            data: { id: state.id, label: `${stateName} (${actionName})` },
+            position: { x: state.x, y: state.y }
+        }]);
 
         //this.graph.layout({ name: 'cose' }).run();
     }
@@ -250,7 +293,7 @@ class Program {
 
         this.log(`Renaming state ${this.selectedState} to ${newName}`);
 
-        this.snapshotAndExecute(() => {
+        this.executeAndSnapshot(() => {
             this.ir.updateStateProperties(
                 this.selectedState,
                 newName, null, null, null);
@@ -270,7 +313,7 @@ class Program {
 
         this.log(`Changing action of ${this.selectedState} to ${newAction}`);
 
-        this.snapshotAndExecute(() => {
+        this.executeAndSnapshot(() => {
             this.ir.updateStateProperties(
                 this.selectedState,
                 null, null, newAction, null);
@@ -290,7 +333,7 @@ class Program {
 
         this.log(`Changing destination of ${this.selectedState} to ${newDestination}`);
 
-        this.snapshotAndExecute(() => {
+        this.executeAndSnapshot(() => {
             this.ir.updateStateProperties(
                 this.selectedState,
                 null, null, null, newDestination);
@@ -317,7 +360,7 @@ class Program {
         const transitions = newTransitions.map((transition) =>
             new GraphTransitionIR(transition.conditionName, transition.destinationTargetName));
 
-        this.snapshotAndExecute(() => {
+        this.executeAndSnapshot(() => {
             this.ir.updateStateProperties(
                 this.selectedState,
                 null, transitions, null, null);
@@ -329,12 +372,18 @@ class Program {
             this.getCurrentStates()[this.selectedState]);
     }
 
+    resetHistory() {
+        /** @type {ProgramHistory} */
+        this.history = new ProgramHistory();
+        this.history.addSnapshot(JSON.stringify(this.ir));
+    }
+
     /**
      * @param {() => void} action 
      */
-    snapshotAndExecute(action) {
-        this.history.addSnapshot(JSON.stringify(this.ir));
+    executeAndSnapshot(action) {
         action();
+        this.history.addSnapshot(JSON.stringify(this.ir));
     }
 
     undo() {
@@ -344,7 +393,7 @@ class Program {
             return;
         }
 
-        this.ir = JSON.parse(previousState);
+        this.restoreSnapshot(previousState);
     }
 
     redo() {
@@ -354,7 +403,16 @@ class Program {
             return;
         }
 
-        this.ir = JSON.parse(nextState);
+        this.restoreSnapshot(nextState);
+    }
+
+    /**
+     * @param {string} snapshot Serialized IR taken by executeAndSnapshot
+     */
+    restoreSnapshot(snapshot) {
+        // JSON.parse alone would leave the IR without its prototypes.
+        this.ir = GraphIR.fromJSON(JSON.parse(snapshot));
+        this.restoreFromIr();
     }
 
     /**

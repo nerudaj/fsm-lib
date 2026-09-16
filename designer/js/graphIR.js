@@ -7,6 +7,14 @@ class GraphTransitionIR {
         /** @type {string} */ this.conditionName = conditionName;
         /** @type {string} */ this.destinationId = destinationId;
     }
+
+    /**
+     * @param {any} obj
+     * @returns {GraphTransitionIR}
+     */
+    static fromJSON(obj) {
+        return new GraphTransitionIR(obj.conditionName, obj.destinationId);
+    }
 }
 
 class GraphStateIR {
@@ -23,6 +31,21 @@ class GraphStateIR {
         /** @type {GraphTransitionIR[]} */ this.transitions = [];
         /** @type {string} */ this.actionName = actionName;
         /** @type {string} */ this.destinationId = "";
+    }
+
+    /**
+     * @param {any} obj
+     * @returns {GraphStateIR}
+     */
+    static fromJSON(obj) {
+        const state = new GraphStateIR(obj.id, obj.name, obj.actionName);
+
+        state.x = obj.x ?? 0;
+        state.y = obj.y ?? 0;
+        state.destinationId = obj.destinationId ?? "";
+        state.transitions = (obj.transitions ?? []).map(GraphTransitionIR.fromJSON);
+
+        return state;
     }
 }
 
@@ -43,10 +66,29 @@ class GraphMachineIR {
         }
 
     }
+
+    /**
+     * @param {any} obj
+     * @returns {GraphMachineIR}
+     */
+    static fromJSON(obj) {
+        const machine = new GraphMachineIR(null);
+
+        machine.entryStateId = obj.entryStateId ?? "";
+
+        for (const [stateId, state] of Object.entries(obj.states ?? {})) {
+            machine.states[stateId] = GraphStateIR.fromJSON(state);
+        }
+
+        return machine;
+    }
 }
 
 class GraphIR {
+    static VERSION = 1;
+
     constructor() {
+        /** @type {number} */ this.version = GraphIR.VERSION;
         /** @type {ManifestModel} */ this.manifest = new ManifestModel(null);
         /** @type {string} */ this.currentMachineId = "Main";
         /** @type {{ [key: string]: GraphMachineIR }} */
@@ -54,6 +96,43 @@ class GraphIR {
             "Main": new GraphMachineIR(null)
         };
         /** @type {number} */ this.stateCounter = 0;
+    }
+
+    /**
+     * Rebuilds a GraphIR from parsed project JSON. JSON.parse yields plain
+     * objects, so every nested model has to be reconstructed to get its
+     * prototype back.
+     * @param {any} obj
+     * @returns {GraphIR}
+     */
+    static fromJSON(obj) {
+        if (!obj || typeof obj !== "object") {
+            throw new Error("Project file is not an object");
+        }
+        else if (obj.version !== GraphIR.VERSION) {
+            throw new Error(
+                `Unsupported project version ${obj.version}, expected ${GraphIR.VERSION}`);
+        }
+        else if (!obj.machines || typeof obj.machines !== "object") {
+            throw new Error("Project file has no machines");
+        }
+
+        const ir = new GraphIR();
+
+        ir.manifest = new ManifestModel(obj.manifest ?? null);
+        ir.currentMachineId = obj.currentMachineId;
+        ir.stateCounter = obj.stateCounter ?? 0;
+        ir.machines = {};
+
+        for (const [machineId, machine] of Object.entries(obj.machines)) {
+            ir.machines[machineId] = GraphMachineIR.fromJSON(machine);
+        }
+
+        if (!(ir.currentMachineId in ir.machines)) {
+            throw new Error(`Current machine ${ir.currentMachineId} is not among the machines`);
+        }
+
+        return ir;
     }
 
     /**

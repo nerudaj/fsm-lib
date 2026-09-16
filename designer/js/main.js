@@ -43,11 +43,12 @@ function loadModel() {
 }
 
 function saveModel() {
-    selectFileAndExecute((file) => {
-        if (program) {
-            program.saveModelToFile(file);
-        }
-    });
+    if (!program) {
+        console.error("Program is null");
+        return;
+    }
+
+    program.saveModelToFile();
 }
 
 function undo() {
