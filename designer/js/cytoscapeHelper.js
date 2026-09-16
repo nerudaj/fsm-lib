@@ -57,6 +57,14 @@ class CytoscapeHelper {
                     "target-arrow-shape": text("--graph-edge-target-arrow-shape"),
                     "curve-style": text("--graph-edge-curve-style")
                 }
+            },
+            {
+                selector: "edge:loop",
+                style: {
+                    "loop-direction": text("--graph-loop-direction"),
+                    "loop-sweep": text("--graph-loop-sweep"),
+                    "control-point-step-size": number("--graph-loop-size")
+                }
             }
         ];
     }

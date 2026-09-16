@@ -69,4 +69,8 @@ main #Graph {
     --graph-edge-target-arrow-color: #64748b;
     --graph-edge-target-arrow-shape: triangle;
     --graph-edge-curve-style: bezier;
+
+    --graph-loop-direction: 0deg;
+    --graph-loop-sweep: -90deg;
+    --graph-loop-size: 60;
 }
