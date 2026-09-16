@@ -70,6 +70,15 @@ main #Graph {
     --graph-edge-target-arrow-shape: triangle;
     --graph-edge-curve-style: bezier;
 
+    --graph-edge-text-color: #1e293b;
+    --graph-edge-font-size: 9;
+    --graph-edge-text-rotation: autorotate;
+    --graph-edge-text-margin-y: -8;
+    --graph-edge-text-background-color: #f8fafc;
+    --graph-edge-text-background-opacity: 0.9;
+    --graph-edge-text-background-padding: 3;
+    --graph-edge-text-background-shape: round-rectangle;
+
     --graph-loop-direction: 0deg;
     --graph-loop-sweep: -90deg;
     --graph-loop-size: 60;

@@ -55,7 +55,16 @@ class CytoscapeHelper {
                     "line-color": text("--graph-edge-line-color"),
                     "target-arrow-color": text("--graph-edge-target-arrow-color"),
                     "target-arrow-shape": text("--graph-edge-target-arrow-shape"),
-                    "curve-style": text("--graph-edge-curve-style")
+                    "curve-style": text("--graph-edge-curve-style"),
+                    label: "data(label)",
+                    color: text("--graph-edge-text-color"),
+                    "font-size": number("--graph-edge-font-size"),
+                    "text-rotation": text("--graph-edge-text-rotation"),
+                    "text-margin-y": number("--graph-edge-text-margin-y"),
+                    "text-background-color": text("--graph-edge-text-background-color"),
+                    "text-background-opacity": number("--graph-edge-text-background-opacity"),
+                    "text-background-padding": number("--graph-edge-text-background-padding"),
+                    "text-background-shape": text("--graph-edge-text-background-shape")
                 }
             },
             {
