@@ -482,17 +482,17 @@ class Program {
 
         var transitionsChanged = (() => {
             if (selectedState.transitions.length != formModel.transitions.length)
-                return false;
+                return true;
 
             for (var i = 0; i < selectedState.transitions.length; ++i) {
                 if (selectedState.transitions[i].conditionName != formModel.transitions[i].conditionName)
-                    return false;
+                    return true;
 
                 if (selectedState.transitions[i].destinationId != formModel.transitions[i].destinationTargetName)
-                    return false;
+                    return true;
             }
 
-            return true;
+            return false;
         })();
 
         if (transitionsChanged)
