@@ -47,3 +47,26 @@ main #Graph {
 .hidden {
     display: none;
 }
+
+/* Cytoscape graph styling.
+   These custom properties are the single source of truth for how nodes and
+   edges look; js/program.js reads them off #Graph via getComputedStyle and
+   feeds them to Cytoscape, which cannot consume a browser stylesheet itself. */
+#Graph {
+    --graph-node-shape: round-rectangle;
+    --graph-node-background-color: #3b82f6;
+    --graph-node-text-color: #fff;
+    --graph-node-text-valign: center;
+    --graph-node-text-halign: center;
+    --graph-node-text-wrap: wrap;
+    --graph-node-text-justification: center;
+    --graph-node-text-max-width: 200;
+    --graph-node-width: 200;
+    --graph-node-font-size: 10;
+
+    --graph-edge-width: 2;
+    --graph-edge-line-color: #64748b;
+    --graph-edge-target-arrow-color: #64748b;
+    --graph-edge-target-arrow-shape: triangle;
+    --graph-edge-curve-style: bezier;
+}

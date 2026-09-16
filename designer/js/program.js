@@ -1,55 +1,3 @@
-/**
- * @returns {cytoscape} A default graph instance
- */
-function createDefaultGraph() {
-    // docs https://js.cytoscape.org/
-    const cy = cytoscape({
-        container: document.getElementById("Graph"),
-        elements: [
-            //{ data: { id: "Start", label: "Start" } },
-            //{ data: { id: "B_loop", source: "B", target: "B" } }
-        ],
-        // TODO: ideally place the styles in styles.css without declaring them in JS
-        style: [
-            {
-                selector: "node",
-                style: {
-                    label: "data(label)",
-                    shape: 'round-rectangle',
-                    "background-color": "#3b82f6",
-                    color: "#fff",
-                    "text-valign": "center",
-                    "text-halign": "center",
-                    width: 200,
-                    "font-size": 10,
-                    "text-wrap": "wrap",
-                    "text-max-width": 200,
-                    "text-justification": "center",
-                }
-            },
-            {
-                selector: "edge",
-                style: {
-                    width: 2,
-                    "line-color": "#64748b",
-                    "target-arrow-color": "#64748b",
-                    "target-arrow-shape": "triangle",
-                    "curve-style": "bezier"
-                }
-            }
-        ],
-        layout: {
-            name: "preset"
-        }
-    });
-
-
-    /*cy.$id("Start").position({ x: 120, y: 120 });
-    cy.fit(40);*/
-
-    return cy;
-}
-
 class Program {
     constructor() {
         /** @type {GraphIR} */
@@ -59,7 +7,7 @@ class Program {
         this.selectedState = null;
 
         /** @type {cytoscape} */
-        this.graph = createDefaultGraph();
+        this.graph = CytoscapeHelper.createDefaultGraph();
         this.graph.on("tap", /** @param {any} evt */(evt) => {
             if (evt.target === this.graph) {
                 this.onNodeUnselected();
