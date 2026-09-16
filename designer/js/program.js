@@ -270,7 +270,8 @@ class Program {
             position: { x: state.x, y: state.y }
         }]);
 
-        //this.graph.layout({ name: 'cose' }).run();
+        this.selectedState = state.id;
+        this.onSelectedStateDestinationChange(state.id);
     }
 
     /**
