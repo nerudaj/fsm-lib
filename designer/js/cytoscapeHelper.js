@@ -74,7 +74,7 @@ class CytoscapeHelper {
                 //{ data: { id: "Start", label: "Start" } },
                 //{ data: { id: "B_loop", source: "B", target: "B" } }
             ],
-            style: readGraphStyleFromCss(container),
+            style: CytoscapeHelper.readGraphStyleFromCss(container),
             layout: {
                 name: "preset"
             }
@@ -85,5 +85,57 @@ class CytoscapeHelper {
         cy.fit(40);*/
 
         return cy;
+    }
+
+    /**
+     * @param {cytoscape} graph The graph the node lives in
+     * @param {string} nodeId ID of the node whose edges are rebuilt
+     * @param {GraphStateIR} state Model of the state the node maps to
+     */
+    static rebuildStateEdges(graph, nodeId, state) {
+        const node = graph.$id(nodeId);
+
+        if (node.empty()) {
+            console.error(`CytoscapeHelper::rebuildStateEdges: no node with ID ${nodeId}`);
+            return;
+        }
+
+        // outgoers() keeps self-loops, since their source is the node itself.
+        node.outgoers("edge").remove();
+
+        const edges = [];
+
+        /**
+         * @param {string} id
+         * @param {string} destinationId
+         * @param {string} label
+         */
+        function addEdge(id, destinationId, label) {
+            if (!destinationId) return;
+
+            if (graph.$id(destinationId).empty()) {
+                console.error(`CytoscapeHelper::rebuildStateEdges: transition from ${nodeId} points to unknown node ${destinationId}`);
+                return;
+            }
+
+            edges.push({
+                group: "edges",
+                data: {
+                    id: id,
+                    source: nodeId,
+                    target: destinationId,
+                    label: label
+                }
+            });
+        }
+
+        state.transitions.forEach((transition, index) => {
+            // The index keeps parallel transitions to the same state apart.
+            addEdge(`${nodeId}::transition::${index}`, transition.destinationId, transition.conditionName);
+        });
+
+        addEdge(`${nodeId}::default`, state.destinationId, "default");
+
+        graph.add(edges);
     }
 }
