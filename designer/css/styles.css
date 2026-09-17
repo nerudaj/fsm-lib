@@ -56,7 +56,9 @@ main #Graph {
     --graph-node-shape: round-rectangle;
     /* states are using colors from bootstrap */
     --graph-node-background-color: var(--bs-secondary);
-    --graph-node-entry-background-color: var(--bs-success);
+    --graph-node-entry-background-color: var(--bs-primary);
+    --graph-node-accept-background-color: var(--bs-success);
+    --graph-node-reject-background-color: var(--bs-danger);
     --graph-node-text-color: #fff;
     --graph-node-text-valign: center;
     --graph-node-text-halign: center;

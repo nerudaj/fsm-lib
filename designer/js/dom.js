@@ -68,6 +68,19 @@ class DomHelper {
     }
 
     /**
+     * @param {string} idToCheck 
+     * @param {string} name 
+     */
+    static setRadioInput(idToCheck, name) {
+        var inputs = document.getElementsByName(name);
+        for (var input of inputs) {
+            if (input instanceof HTMLInputElement && input.type === "radio") {
+                input.checked = (input.id === idToCheck);
+            }
+        }
+    }
+
+    /**
      * @param {string} id
      * @param {(element: HTMLLIElement) => void} callback
      */

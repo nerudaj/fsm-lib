@@ -4,13 +4,21 @@ class Program {
         this.ir = new GraphIR();
 
         /** @type {string|null} */
-        this.selectedState = null;
+        this.selectedState = "";
 
         /** @type {string} */
         this.modelFileName = "project.json";
 
         /** @type {string|null} Remembered only once the user names an export */
         this.exportFileName = null;
+
+        /** @type {EditStateModal} */
+        this.editStateModal = new EditStateModal(
+            "EditState",
+            (selectElement) => this.updateActionNameSelect(selectElement),
+            (selectElement) => this.updateConditionSelect(selectElement),
+            (selectElement) => this.updateTransitionDestinationSelect(selectElement)
+        );
 
         /** @type {cytoscape} */
         this.graph = CytoscapeHelper.createDefaultGraph();
@@ -73,13 +81,21 @@ class Program {
     }
 
     /**
-     * 
      * @param {HTMLSelectElement} select 
      */
     updateActionNameSelect(select) {
         DomHelper.populateSelectElement(
             select,
             this.ir.manifest.actionNames.map(actionName => ({ value: actionName, label: actionName })));
+    }
+
+    /**
+     * @param {HTMLSelectElement} select 
+     */
+    updateConditionSelect(select) {
+        DomHelper.populateSelectElement(
+            select,
+            this.ir.manifest.conditionNames.map(conditionName => ({ value: conditionName, label: conditionName })));
     }
 
     /**
@@ -222,63 +238,18 @@ class Program {
     }
 
     /**
-     * @param {boolean} enabled 
-     * @param {string} stateName 
-     * @param {string} actionName 
-     * @param {string} destinationId 
-     */
-    bootstrapStateEditForm(enabled, stateName, actionName, destinationId) {
-        var stateNameInput = document.getElementById("EditState_NameInput");
-        var addTransitionButton = document.getElementById("EditState_AddTransitionButton");
-        var actionNameSelect = document.getElementById("EditState_ActionSelect");
-        var defaultTransitionSelect = document.getElementById("EditState_DestinationSelect");
-
-        if (!addTransitionButton || !(addTransitionButton instanceof HTMLButtonElement)) return;
-        else if (!stateNameInput || !(stateNameInput instanceof HTMLInputElement)) return;
-        else if (!actionNameSelect || !(actionNameSelect instanceof HTMLSelectElement)) return;
-        else if (!defaultTransitionSelect || !(defaultTransitionSelect instanceof HTMLSelectElement)) return;
-
-        if (enabled) {
-            this.updateActionNameSelect(actionNameSelect);
-            this.updateTransitionDestinationSelect(defaultTransitionSelect);
-        }
-
-        stateNameInput.disabled = !enabled;
-        addTransitionButton.disabled = !enabled;
-        actionNameSelect.disabled = !enabled;
-        defaultTransitionSelect.disabled = !enabled;
-
-        stateNameInput.value = stateName;
-        actionNameSelect.value = actionName;
-        defaultTransitionSelect.value = destinationId;
-    }
-
-    /**
      * @param {any} node 
      */
     onNodeClicked(node) {
         const stateName = node.id();
         this.selectedState = stateName;
+        this.editStateModal.bootstrapForm(
+            this.getCurrentStates()[stateName], StateKind.Regular);
 
-        const modal = new bootstrap.Modal(document.getElementById('stateInspectorModal'));
-        modal.show();
-
-        this.bootstrapStateEditForm(
-            /* enabled */ true,
-            this.getCurrentStates()[stateName].name,
-            this.getCurrentStates()[stateName].actionName,
-            this.getCurrentStates()[stateName].destinationId);
+        new bootstrap.Modal(document.getElementById('stateInspectorModal')).show();
     }
 
-    onNodeUnselected() {
-        this.selectedState = null;
-
-        this.bootstrapStateEditForm(
-            /* enabled */ false,
-            "",
-            "",
-            "");
-    }
+    onNodeUnselected() { /* current unused */ }
 
     /**
      * @param {any} node
@@ -490,42 +461,13 @@ class Program {
         this.restoreFromIr();
     }
 
-    /**
-     * @returns {FsmFormStateModel}
-     */
-    readEditStateModal() {
-        var result = new FsmFormStateModel();
-
-        result.stateName = DomHelper.readTextInput("EditState_NameInput");
-        result.actionName = DomHelper.readSelectInput("EditState_ActionSelect");
-        result.destinationTargetName = DomHelper.readSelectInput("EditState_DestinationSelect");
-        result.stateKind = DomHelper.readRadioInput("RadioStateKindEntry")
-            ? StateKind.Entry
-            : StateKind.Regular;
-
-        DomHelper.iterateUlChildren("EditState_TransitionList", (element) => {
-            var selects = element.getElementsByTagName("select");
-
-            if (selects.length !== 2) {
-                throw new Error(`There are not exactly two <select>s in the <li> element`);
-            }
-
-            result.transitions.push(new FsmTransitionModel(
-                DomHelper.readSelectInput(selects[0].id),
-                DomHelper.readSelectInput(selects[1].id)
-            ));
-        });
-
-        return result;
-    }
-
     updateSelectedState() {
         if (!this.selectedState) {
             console.error("program::updateSelectedState: selectedState is null");
             return;
         }
 
-        var formModel = this.readEditStateModal();
+        var formModel = this.editStateModal.readForm();
         var selectedState = this.getCurrentStates()[this.selectedState];
 
         if (selectedState.name != formModel.stateName)
