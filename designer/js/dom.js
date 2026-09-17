@@ -49,7 +49,26 @@ class DomHelper {
     }
 
     /**
-     * @param {string} id 
+     * @param {string} id
+     * @returns {boolean} Whether the radio button is selected
+     */
+    static readRadioInput(id) {
+        var input = document.getElementById(id);
+        if (!input) {
+            throw new Error(`Element ${id} does not exist`);
+        }
+        else if (!(input instanceof HTMLInputElement)) {
+            throw new Error(`Element ${id} is not HTMLInputElement`);
+        }
+        else if (input.type !== "radio") {
+            throw new Error(`Element ${id} is not a radio button`);
+        }
+
+        return input.checked;
+    }
+
+    /**
+     * @param {string} id
      * @param {(element: HTMLLIElement) => void} callback
      */
     static iterateUlChildren(id, callback) {
