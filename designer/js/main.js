@@ -51,6 +51,15 @@ function saveModel() {
     program.saveModelToFile();
 }
 
+function exportModel() {
+    if (!program) {
+        console.error("Program is null");
+        return;
+    }
+
+    // TODO:this
+}
+
 function undo() {
     if (program) {
         program.undo();
