@@ -1,0 +1,31 @@
+{
+    "version": 1,
+    "actionNames": [
+        "doNothing",
+        "waitTillAttackFinishes",
+        "attack",
+        "moveTowardsWaypoint",
+        "moveTowardsTarget",
+        "generateWaypointInFrontOfTarget",
+        "generateWaypointBehindOfTarget",
+        "generateWaypointShortestPath",
+        "generateWaypointForFlyingNpc",
+        "lookAtTarget",
+        "choosePlayerAsTarget",
+        "chooseTargetForEnemyNpc",
+        "chooseTargetForFriendlyNpc",
+        "invalidateWaypoint"
+    ],
+    "conditionNames": [
+        "isTargetVisible",
+        "isTargetVisibleOnAltMesh",
+        "isTargetInMeleeRange",
+        "isTargetInShootingRange",
+        "isOwnerIdleOrWalking",
+        "hasNpcReachedWaypoint",
+        "hasValidTarget",
+        "isTargetVisibleForShooting(",
+        "isGunReady",
+        "isTargetValidAndVisibleAndInShootingRange"
+    ]
+}
