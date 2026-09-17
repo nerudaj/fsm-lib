@@ -57,7 +57,7 @@ function exportModel() {
         return;
     }
 
-    // TODO:this
+    program.exportModelToFile();
 }
 
 function undo() {

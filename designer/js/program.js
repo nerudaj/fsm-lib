@@ -9,6 +9,9 @@ class Program {
         /** @type {string} */
         this.modelFileName = "project.json";
 
+        /** @type {string|null} Remembered only once the user names an export */
+        this.exportFileName = null;
+
         /** @type {cytoscape} */
         this.graph = CytoscapeHelper.createDefaultGraph();
         this.graph.on("tap", /** @param {any} evt */(evt) => {
@@ -122,6 +125,7 @@ class Program {
                 this.log(`Selected file: ${file.name}`);
                 this.ir = GraphIR.fromJSON(JSON.parse(jsonText));
                 this.modelFileName = file.name;
+                this.exportFileName = null;
 
                 this.resetHistory();
                 this.restoreFromIr();
@@ -148,13 +152,17 @@ class Program {
         }
     }
 
-    async saveModelToFile() {
-        const jsonText = JSON.stringify(this.ir, null, 2);
-
+    /**
+     * Writes text through the save dialog, falling back to a plain download.
+     * @param {string} suggestedName
+     * @param {string} text
+     * @returns {Promise<string>} Name the file was written under
+     */
+    async saveTextToFile(suggestedName, text) {
         if (typeof window.showSaveFilePicker === "function") {
             try {
                 const handle = await window.showSaveFilePicker({
-                    suggestedName: this.modelFileName,
+                    suggestedName: suggestedName,
                     types: [{
                         description: "FSM model",
                         accept: { "application/json": [".json"] }
@@ -162,22 +170,55 @@ class Program {
                 });
 
                 const writable = await handle.createWritable();
-                await writable.write(jsonText);
+                await writable.write(text);
                 await writable.close();
 
-                this.modelFileName = handle.name;
-                return;
+                return handle.name;
             }
             catch (error) {
                 if (error instanceof DOMException && error.name === "AbortError") {
-                    return;
+                    return suggestedName;
                 }
 
                 console.error("Save dialog failed, falling back to download:", error);
             }
         }
 
-        DomHelper.downloadTextFile(this.modelFileName, jsonText, "application/json");
+        DomHelper.downloadTextFile(suggestedName, text, "application/json");
+        return suggestedName;
+    }
+
+    async saveModelToFile() {
+        this.modelFileName = await this.saveTextToFile(
+            this.modelFileName,
+            JSON.stringify(this.ir, null, 2));
+    }
+
+    /**
+     * @returns {string}
+     */
+    getExportFileName() {
+        if (this.exportFileName) {
+            return this.exportFileName;
+        }
+
+        return this.modelFileName.replace(/\.json$/i, "") + ".export.json";
+    }
+
+    /**
+     * Exports the current machine as a model the C++ importer can load.
+     */
+    async exportModelToFile() {
+        const model = FsmModel.fromGraphMachine(this.ir.getCurrentMachine());
+
+        if (model instanceof Fail) {
+            alert(`Cannot export the model:\n${model.message}`);
+            return;
+        }
+
+        this.exportFileName = await this.saveTextToFile(
+            this.getExportFileName(),
+            JSON.stringify(model, null, 2));
     }
 
     /**
