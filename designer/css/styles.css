@@ -54,7 +54,9 @@ main #Graph {
    feeds them to Cytoscape, which cannot consume a browser stylesheet itself. */
 #Graph {
     --graph-node-shape: round-rectangle;
-    --graph-node-background-color: #3b82f6;
+    /* states are using colors from bootstrap */
+    --graph-node-background-color: var(--bs-secondary);
+    --graph-node-entry-background-color: var(--bs-success);
     --graph-node-text-color: #fff;
     --graph-node-text-valign: center;
     --graph-node-text-halign: center;

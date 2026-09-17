@@ -49,6 +49,14 @@ class CytoscapeHelper {
                 }
             },
             {
+                // Set by Program::setStateColorBasedOnKind. Declared after the
+                // plain node rule so it overrides the regular background.
+                selector: "node.entry-state",
+                style: {
+                    "background-color": text("--graph-node-entry-background-color")
+                }
+            },
+            {
                 selector: "edge",
                 style: {
                     width: number("--graph-edge-width"),

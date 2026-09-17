@@ -40,6 +40,11 @@ function FsmModel(obj) {
     this.states = obj.states;
 }
 
+const StateKind = {
+    Entry: "Entry",
+    Regular: "Regular"
+};
+
 function FsmFormStateModel() {
     /** @type {string} */
     this.stateName = "";
@@ -49,4 +54,6 @@ function FsmFormStateModel() {
     this.actionName = "";
     /** @type {string} */
     this.destinationTargetName = "";
+    /** @type {string} */
+    this.stateKind = StateKind.Regular;
 }

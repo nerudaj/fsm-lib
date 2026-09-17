@@ -259,9 +259,15 @@ class Program {
         state.x = 100 + (index % 4) * 250;
         state.y = 100 + Math.floor(index / 4) * 150;
 
+        var isFirstState = false
         this.executeAndSnapshot(() => {
             state.id = this.ir.getNewStateId();
+            isFirstState = Object.keys(this.getCurrentStates()).length === 0;
             this.getCurrentStates()[state.id] = state;
+
+            if (isFirstState) {
+                this.ir.getCurrentMachine().entryStateId = state.id;
+            }
         });
 
         this.graph.add([{
@@ -272,6 +278,10 @@ class Program {
 
         this.selectedState = state.id;
         this.onSelectedStateDestinationChange(state.id);
+
+        if (isFirstState) {
+            this.setStateColorBasedOnKind(state.id, StateKind.Entry);
+        }
     }
 
     /**
@@ -373,6 +383,23 @@ class Program {
             this.getCurrentStates()[this.selectedState]);
     }
 
+    /**
+     * @param {string} stateId 
+     * @param {string} stateKind 
+     */
+    setStateColorBasedOnKind(stateId, stateKind) {
+        const node = this.graph.$id(stateId);
+
+        if (node.empty()) {
+            console.error(`program::setStateColorBasedOnKind: no node with ID ${stateId}`);
+            return;
+        }
+
+        // The colors themselves live in css/styles.css; the class only picks
+        // which of them applies.
+        node.toggleClass("entry-state", stateKind === StateKind.Entry);
+    }
+
     resetHistory() {
         /** @type {ProgramHistory} */
         this.history = new ProgramHistory();
@@ -425,6 +452,9 @@ class Program {
         result.stateName = DomHelper.readTextInput("EditState_NameInput");
         result.actionName = DomHelper.readSelectInput("EditState_ActionSelect");
         result.destinationTargetName = DomHelper.readSelectInput("EditState_DestinationSelect");
+        result.stateKind = DomHelper.readRadioInput("RadioStateKindEntry")
+            ? StateKind.Entry
+            : StateKind.Regular;
 
         DomHelper.iterateUlChildren("EditState_TransitionList", (element) => {
             var selects = element.getElementsByTagName("select");
@@ -477,5 +507,12 @@ class Program {
 
         if (transitionsChanged)
             this.onSelectedStateTransitionsChange(formModel.transitions);
+
+        var isThisStateEntryOne = this.ir.getCurrentMachine().entryStateId == selectedState.id;
+        if (formModel.stateKind == StateKind.Entry && !isThisStateEntryOne) {
+            this.setStateColorBasedOnKind(selectedState.id, StateKind.Entry);
+            this.setStateColorBasedOnKind(this.ir.getCurrentMachine().entryStateId, StateKind.Regular);
+            this.ir.getCurrentMachine().entryStateId = selectedState.id;
+        }
     }
 }
