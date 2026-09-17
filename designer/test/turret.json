@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "manifest": {
+    "version": 1,
+    "actionNames": [
+      "doNothing",
+      "waitTillAttackFinishes",
+      "attack",
+      "moveTowardsWaypoint",
+      "moveTowardsTarget",
+      "generateWaypointInFrontOfTarget",
+      "generateWaypointBehindOfTarget",
+      "generateWaypointShortestPath",
+      "generateWaypointForFlyingNpc",
+      "lookAtTarget",
+      "choosePlayerAsTarget",
+      "chooseTargetForEnemyNpc",
+      "chooseTargetForFriendlyNpc",
+      "invalidateWaypoint"
+    ],
+    "conditionNames": [
+      "isTargetVisible",
+      "isTargetVisibleOnAltMesh",
+      "isTargetInMeleeRange",
+      "isTargetInShootingRange",
+      "isOwnerIdleOrWalking",
+      "hasNpcReachedWaypoint",
+      "hasValidTarget",
+      "isTargetVisibleForShooting(",
+      "isGunReady",
+      "isTargetValidAndVisibleAndInShootingRange"
+    ]
+  },
+  "currentMachineId": "Main",
+  "machines": {
+    "Main": {
+      "entryStateId": "State1",
+      "states": {
+        "State1": {
+          "x": 100,
+          "y": 100,
+          "id": "State1",
+          "name": "Start",
+          "transitions": [],
+          "actionName": "chooseTargetForFriendlyNpc",
+          "destinationId": "State2"
+        },
+        "State2": {
+          "x": 521.8437522307895,
+          "y": 403.27155472068955,
+          "id": "State2",
+          "name": "WaitingForSpawnToFinish",
+          "transitions": [
+            {
+              "conditionName": "isOwnerIdleOrWalking",
+              "destinationId": "State3"
+            }
+          ],
+          "actionName": "doNothing",
+          "destinationId": "State2"
+        },
+        "State3": {
+          "x": 548.4025713494013,
+          "y": 42.9867691650924,
+          "id": "State3",
+          "name": "Idle",
+          "transitions": [
+            {
+              "conditionName": "isTargetValidAndVisibleAndInShootingRange",
+              "destinationId": "State1"
+            }
+          ],
+          "actionName": "lookAtTarget",
+          "destinationId": "State4"
+        },
+        "State4": {
+          "x": -47.851548914605296,
+          "y": 470.4639253762153,
+          "id": "State4",
+          "name": "WaitForGunReady",
+          "transitions": [
+            {
+              "conditionName": "isTargetValidAndVisibleAndInShootingRange",
+              "destinationId": "State1"
+            },
+            {
+              "conditionName": "isGunReady",
+              "destinationId": "State5"
+            }
+          ],
+          "actionName": "lookAtTarget",
+          "destinationId": "State4"
+        },
+        "State5": {
+          "x": 413.86757371381316,
+          "y": 760.7164172216114,
+          "id": "State5",
+          "name": "Attack",
+          "transitions": [],
+          "actionName": "attack",
+          "destinationId": "State6"
+        },
+        "State6": {
+          "x": 763.9699671719136,
+          "y": 387.05899728473264,
+          "id": "State6",
+          "name": "WaitUntilAttackFinishes",
+          "transitions": [
+            {
+              "conditionName": "isOwnerIdleOrWalking",
+              "destinationId": "State3"
+            }
+          ],
+          "actionName": "lookAtTarget",
+          "destinationId": "State6"
+        }
+      }
+    }
+  },
+  "stateCounter": 6
+}
