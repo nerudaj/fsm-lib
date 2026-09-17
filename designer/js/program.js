@@ -138,6 +138,14 @@ class Program {
         this.onNodeUnselected();
         this.updateAddStateModal();
         CytoscapeHelper.rebuildGraph(this.graph, this.ir.getCurrentMachine());
+
+        for (const [id, _] of Object.entries(this.ir.getCurrentMachine().states)) {
+            this.setStateColorBasedOnKind(
+                id,
+                this.ir.getCurrentMachine().entryStateId == id
+                    ? StateKind.Entry
+                    : StateKind.Regular);
+        }
     }
 
     async saveModelToFile() {
@@ -395,8 +403,6 @@ class Program {
             return;
         }
 
-        // The colors themselves live in css/styles.css; the class only picks
-        // which of them applies.
         node.toggleClass("entry-state", stateKind === StateKind.Entry);
     }
 
