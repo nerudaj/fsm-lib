@@ -30,13 +30,19 @@ class EditStateModal {
             : StateKind.Regular;
 
         DomHelper.iterateUlChildren(`${this.id}_TransitionList`, (element) => {
+            var inputs = element.getElementsByTagName("input");
             var selects = element.getElementsByTagName("select");
+
+            if (inputs.length < 1) {
+                throw new Error(`There is no <input> in the transition element`);
+            }
 
             if (selects.length !== 2) {
                 throw new Error(`There are not exactly two <select>s in the <li> element`);
             }
 
             result.transitions.push(new FsmTransitionModel(
+                DomHelper.readToggleInput(inputs[0].id),
                 DomHelper.readSelectInput(selects[0].id),
                 DomHelper.readSelectInput(selects[1].id)
             ));
@@ -96,11 +102,11 @@ class EditStateModal {
 
         var conditionSelect = document.createElement("select");
         conditionSelect.className = "form-select mb-2 mb-md-0";
-        conditionSelect.id = `${this.id}_TransitionFromSelect_` + Date.now();
+        conditionSelect.id = `${this.id}_TransitionFromSelect_` + Date.now(); // TODO: used?
 
         var destinationSelect = document.createElement("select");
         destinationSelect.className = "form-select";
-        destinationSelect.id = `${this.id}_TransitionToSelect_` + Date.now();
+        destinationSelect.id = `${this.id}_TransitionToSelect_` + Date.now(); // TODO: used?
 
         this.updateConditionSelect(conditionSelect);
         this.updateTransitionDestinationSelect(destinationSelect);
@@ -115,8 +121,12 @@ class EditStateModal {
         var row = document.createElement("div");
         row.className = "row g-2 align-items-center";
 
+        var negateCheck = DomHelper.createToggleButton(
+            "Not", `${this.id}_Negate_` + Date.now(), "btn-outline-primary");
+        negateCheck.className = "col-12 col-md-1";
+
         var colFrom = document.createElement("div");
-        colFrom.className = "col-12 col-md-5";
+        colFrom.className = "col-12 col-md-4";
         colFrom.appendChild(conditionSelect);
 
         var colArrow = document.createElement("div");
@@ -128,6 +138,7 @@ class EditStateModal {
         colTo.className = "col-12 col-md-5";
         colTo.appendChild(destinationSelect);
 
+        row.appendChild(negateCheck);
         row.appendChild(colFrom);
         row.appendChild(colArrow);
         row.appendChild(colTo);

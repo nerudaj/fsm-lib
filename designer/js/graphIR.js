@@ -1,9 +1,11 @@
 class GraphTransitionIR {
     /**
+     * @param {boolean} negated
      * @param {string} conditionName
      * @param {string} destinationId
      */
-    constructor(conditionName, destinationId) {
+    constructor(negated, conditionName, destinationId) {
+        /** @type {boolean} */ this.negated = negated;
         /** @type {string} */ this.conditionName = conditionName;
         /** @type {string} */ this.destinationId = destinationId;
     }
@@ -13,7 +15,7 @@ class GraphTransitionIR {
      * @returns {GraphTransitionIR}
      */
     static fromJSON(obj) {
-        return new GraphTransitionIR(obj.conditionName, obj.destinationId);
+        return new GraphTransitionIR(obj.negated ?? false, obj.conditionName, obj.destinationId);
     }
 }
 

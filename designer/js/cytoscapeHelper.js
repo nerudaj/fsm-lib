@@ -176,7 +176,7 @@ class CytoscapeHelper {
 
         state.transitions.forEach((transition, index) => {
             // The index keeps parallel transitions to the same state apart.
-            addEdge(`${nodeId}::transition::${index}`, transition.destinationId, transition.conditionName);
+            addEdge(`${nodeId}::transition::${index}`, transition.destinationId, `${transition.negated ? "NOT" : ""} ${transition.conditionName}`);
         });
 
         addEdge(`${nodeId}::default`, state.destinationId, "default");

@@ -389,7 +389,7 @@ class Program {
         this.log(`Updating transitions of ${this.selectedState}`);
 
         const transitions = newTransitions.map((transition) =>
-            new GraphTransitionIR(transition.conditionName, transition.destinationTargetName));
+            new GraphTransitionIR(transition.negated, transition.conditionName, transition.destinationTargetName));
 
         this.executeAndSnapshot(() => {
             this.ir.updateStateProperties(
@@ -484,11 +484,11 @@ class Program {
                 return true;
 
             for (var i = 0; i < selectedState.transitions.length; ++i) {
-                if (selectedState.transitions[i].conditionName != formModel.transitions[i].conditionName)
+                if ((selectedState.transitions[i].negated != formModel.transitions[i].negated)
+                    || (selectedState.transitions[i].conditionName != formModel.transitions[i].conditionName)
+                    || (selectedState.transitions[i].destinationId != formModel.transitions[i].destinationTargetName)) {
                     return true;
-
-                if (selectedState.transitions[i].destinationId != formModel.transitions[i].destinationTargetName)
-                    return true;
+                }
             }
 
             return false;

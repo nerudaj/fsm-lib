@@ -1,8 +1,11 @@
 /**
+ * @param {boolean} negated
  * @param {string} conditionName 
  * @param {string} destinationTargetName 
  */
-function FsmTransitionModel(conditionName, destinationTargetName) {
+function FsmTransitionModel(negated, conditionName, destinationTargetName) {
+    /** @type {boolean} */
+    this.negated = negated;
     /** @type {string} */
     this.conditionName = conditionName;
     /** @type {string} */
