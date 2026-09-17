@@ -68,6 +68,25 @@ class DomHelper {
     }
 
     /**
+     * @param {string} id 
+     * @returns {boolean}
+     */
+    static readToggleInput(id) {
+        var input = document.getElementById(id);
+        if (!input) {
+            throw new Error(`Element ${id} does not exist`);
+        }
+        else if (!(input instanceof HTMLInputElement)) {
+            throw new Error(`Element ${id} is not HTMLInputElement`);
+        }
+        else if (input.type !== "checkbox") {
+            throw new Error(`Element ${id} is not a checkbox button`);
+        }
+
+        return input.checked;
+    }
+
+    /**
      * @param {string} idToCheck 
      * @param {string} name 
      */
@@ -119,5 +138,32 @@ class DomHelper {
 
         // Revoking synchronously can cancel a download that has not started.
         setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+
+    /**
+     * @param {string} text 
+     * @param {string} id
+     * @param {string} labelClass
+     * @returns {HTMLDivElement}
+     */
+    static createToggleButton(text, id, labelClass) {
+        var div = document.createElement("div");
+
+        var input = document.createElement("input");
+        input.type = "checkbox";
+        input.className = "btn-check";
+        input.id = id;
+        input.autocomplete = "off";
+
+
+        var label = document.createElement("label");
+        label.className = `btn ${labelClass}`;
+        label.htmlFor = id;
+        label.textContent = text;
+
+        div.appendChild(input);
+        div.appendChild(label);
+
+        return div;
     }
 }
