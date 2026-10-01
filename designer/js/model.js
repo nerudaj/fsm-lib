@@ -177,6 +177,7 @@ FsmModel.fromGraphMachine = function (machine) {
         exported.transitions = state.transitions.length === 0
             ? undefined
             : state.transitions.map((transition) => new FsmTransitionModel(
+                transition.negated,
                 transition.conditionName.trim(),
                 resolveTarget(transition.destinationId)));
 
