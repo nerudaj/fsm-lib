@@ -48,6 +48,12 @@ main #Graph {
     display: none;
 }
 
+#GraphParent {
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
 /* Cytoscape graph styling.
    These custom properties are the single source of truth for how nodes and
    edges look; js/program.js reads them off #Graph via getComputedStyle and
