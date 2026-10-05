@@ -31,6 +31,8 @@ function loadManifest() {
         if (program) {
             program.loadManifestFromFile(file);
         }
+
+        DomHelper.closeModal("WelcomeModal");
     });
 }
 
@@ -39,6 +41,8 @@ function loadModel() {
         if (program) {
             program.loadModelFromFile(file);
         }
+
+        DomHelper.closeModal("WelcomeModal");
     });
 }
 
@@ -141,4 +145,6 @@ function main() {
     program = new Program();
 
     console.log("main finished");
+
+    DomHelper.openModal("WelcomeModal");
 }

@@ -246,7 +246,7 @@ class Program {
         this.editStateModal.bootstrapForm(
             this.getCurrentStates()[stateName], StateKind.Regular);
 
-        new bootstrap.Modal(document.getElementById('stateInspectorModal')).show();
+        DomHelper.openModal('stateInspectorModal');
     }
 
     onNodeUnselected() { /* current unused */ }

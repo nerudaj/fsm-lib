@@ -179,4 +179,19 @@ class DomHelper {
         }
         return result;
     }
+
+    /**
+     * @param {string} id
+     */
+    static openModal(id) {
+        new bootstrap.Modal(document.getElementById(id)).show();
+    }
+
+    /**
+     * @param {string} id
+     */
+    static closeModal(id) {
+        // hide() doesn't work for whatever reason
+        new bootstrap.Modal(document.getElementById(id))._hideModal();
+    }
 }

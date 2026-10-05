@@ -66,109 +66,29 @@
 
     <div class="container-fluid">
         <div class="row">
-            <!-- EDIT STATE SIDEBAR -->
-            <div class="modal fade" id="stateInspectorModal" tabindex="-1" aria-labelledby="stateInspectorModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                    <div class="modal-content">
-
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="stateInspectorModalLabel">State inspector</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-
-                        <div class="modal-body">
-                            <div class="pt-1">
-                                <ul class="nav flex-column">
-
-                                    <li>
-                                        <!-- title moved to modal-header -->
-                                        <div class="text-muted mb-2 d-none"></div>
-                                    </li>
-
-                                    <li class="mb-3">
-                                        <label for="EditState_NameInput" class="form-label">State name</label>
-                                        <input type="text" class="form-control" id="EditState_NameInput">
-                                    </li>
-
-                                    <li>
-                                        <hr>
-                                    </li>
-
-                                    <li class="mb-2">
-                                        <h6 class="mb-2">Transitions</h6>
-
-                                        <ol class="list-group" id="EditState_TransitionList">
-                                        </ol>
-                                    </li>
-
-                                    <li class="mt-2">
-                                        <button class="btn btn-secondary w-100" onclick="addTransitionSelection();"
-                                            id="EditState_AddTransitionButton">+</button>
-                                    </li>
-
-                                    <li class="mt-3">
-                                        <hr>
-                                    </li>
-
-                                    <li class="mb-2">
-                                        <h6 class="mb-2">Default behavior</h6>
-                                    </li>
-
-                                    <li class="mb-3">
-                                        <div class="row g-3">
-                                            <div class="col-12 col-md-6">
-                                                <label for="EditState_ActionSelect" class="form-label">Action</label>
-                                                <select class="form-select" id="EditState_ActionSelect">
-                                                </select>
-                                            </div>
-
-                                            <div class="col-12 col-md-6">
-                                                <label for="EditState_DestinationSelect" class="form-label">Transition
-                                                    to</label>
-                                                <select class="form-select" id="EditState_DestinationSelect">
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li class="mt-3">
-                                        <hr>
-                                    </li>
-
-                                    <li class="mb-3">
-                                        <input type="radio" class="btn-check" name="EditState_StateKindRadio"
-                                            id="EditState_RadioStateKindEntry" autocomplete="off">
-                                        <label class="btn btn-outline-primary" for="EditState_RadioStateKindEntry">Entry
-                                            state</label>
-
-                                        <input type="radio" class="btn-check" name="EditState_StateKindRadio"
-                                            id="EditState_RadioStateKindRegular" autocomplete="off" checked>
-                                        <label class="btn btn-outline-secondary"
-                                            for="EditState_RadioStateKindRegular">Regular
-                                            state</label>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
-                                onclick="applyChangesToState()">Apply</button>
-
-                            <button type="button" class="btn btn-outline-secondary"
-                                data-bs-dismiss="modal">Close</button>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
 
             <!-- MAIN CONTENT -->
             <main id="GraphParent">
                 <div id="Graph"></div>
             </main>
 
+        </div>
+    </div>
+
+    <!-- WELCOME LOADER MODAL -->
+    <div class="modal fade" id="WelcomeModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="WelcomeModalLabel">Welcome</h5>
+                </div>
+                <div class="modal-body">
+                    <p>What do you want to do today?</p>
+                    <button type="button" class="btn btn-secondary" onclick="loadManifest()">Load manifest</button>
+                    <button type="button" class="btn btn-secondary" onclick="loadModel()">Load
+                        project</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -194,6 +114,102 @@
                         <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Add State</button>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT STATE MODAL -->
+    <div class="modal fade" id="stateInspectorModal" tabindex="-1" aria-labelledby="stateInspectorModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="stateInspectorModalLabel">State inspector</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="pt-1">
+                        <ul class="nav flex-column">
+
+                            <li>
+                                <!-- title moved to modal-header -->
+                                <div class="text-muted mb-2 d-none"></div>
+                            </li>
+
+                            <li class="mb-3">
+                                <label for="EditState_NameInput" class="form-label">State name</label>
+                                <input type="text" class="form-control" id="EditState_NameInput">
+                            </li>
+
+                            <li>
+                                <hr>
+                            </li>
+
+                            <li class="mb-2">
+                                <h6 class="mb-2">Transitions</h6>
+
+                                <ol class="list-group" id="EditState_TransitionList">
+                                </ol>
+                            </li>
+
+                            <li class="mt-2">
+                                <button class="btn btn-secondary w-100" onclick="addTransitionSelection();"
+                                    id="EditState_AddTransitionButton">+</button>
+                            </li>
+
+                            <li class="mt-3">
+                                <hr>
+                            </li>
+
+                            <li class="mb-2">
+                                <h6 class="mb-2">Default behavior</h6>
+                            </li>
+
+                            <li class="mb-3">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <label for="EditState_ActionSelect" class="form-label">Action</label>
+                                        <select class="form-select" id="EditState_ActionSelect">
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label for="EditState_DestinationSelect" class="form-label">Transition
+                                            to</label>
+                                        <select class="form-select" id="EditState_DestinationSelect">
+                                        </select>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="mt-3">
+                                <hr>
+                            </li>
+
+                            <li class="mb-3">
+                                <input type="radio" class="btn-check" name="EditState_StateKindRadio"
+                                    id="EditState_RadioStateKindEntry" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="EditState_RadioStateKindEntry">Entry
+                                    state</label>
+
+                                <input type="radio" class="btn-check" name="EditState_StateKindRadio"
+                                    id="EditState_RadioStateKindRegular" autocomplete="off" checked>
+                                <label class="btn btn-outline-secondary" for="EditState_RadioStateKindRegular">Regular
+                                    state</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                        onclick="applyChangesToState()">Apply</button>
+
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+
             </div>
         </div>
     </div>
