@@ -9,6 +9,7 @@ namespace fsm::detail
 
     struct [[nodiscard]] FactoryFsmTransitionModel final
     {
+        bool negated = false;
         std::string conditionName;
         std::string destinationTargetName;
     };

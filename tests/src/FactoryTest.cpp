@@ -101,6 +101,25 @@ static std::string getJsonWithErrorInDefault()
 })";
 }
 
+static std::string getJsonWithNegatedCondition()
+{
+    return R"({
+    "version": 1,
+    "entryStateName": "Start",
+    "states": {
+        "Start": {
+            "transitions": [
+                "negated": true,
+                "conditionName": "alwaysFalse",
+                "destinationTargetName": "__finish__"
+            ],
+            "action": "nothing",
+            "destinationTargetName": "__error__"
+        }
+    }
+})";
+}
+
 static fsm::Factory<Blackboard> makeFactory()
 {
     auto&& factory = fsm::Factory<Blackboard>();
@@ -115,6 +134,7 @@ static fsm::Factory<Blackboard> makeFactory()
     factory.registerCondition(REGISTER_METHOD(isEof));
     factory.registerCondition(REGISTER_METHOD(isExclamationMark));
     factory.registerCondition(REGISTER_METHOD(alwaysTrue));
+    factory.registerCondition(REGISTER_METHOD(alwaysFalse));
 
     return factory;
 }
@@ -179,6 +199,21 @@ TEST_CASE("Happy path", "[Factory]")
         REQUIRE_FALSE(fsm.isFinished(bb));
         fsm.tick(bb);
         REQUIRE(fsm.isFinished(bb));
+    }
+
+    SECTION("Supports negated conditions")
+    {
+        auto&& stream = std::stringstream(getJsonWithNegatedCondition());
+        auto&& importer = fsm::JsonModelImporter(stream);
+        auto&& fsmResult = factory.importFsm(importer);
+        REQUIRE(fsmResult);
+        auto&& fsm = fsmResult.value();
+
+        Blackboard bb;
+        REQUIRE_FALSE(fsm.isFinished(bb));
+        fsm.tick(bb);
+        REQUIRE(fsm.isFinished(bb));
+        REQUIRE_FALSE(fsm.isErrored(bb));
     }
 }
 
