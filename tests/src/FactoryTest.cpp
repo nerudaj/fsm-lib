@@ -109,9 +109,11 @@ static std::string getJsonWithNegatedCondition()
     "states": {
         "Start": {
             "transitions": [
-                "negated": true,
-                "conditionName": "alwaysFalse",
-                "destinationTargetName": "__finish__"
+                {
+                    "negated": true,
+                    "conditionName": "alwaysFalse",
+                    "destinationTargetName": "__finish__"
+                }
             ],
             "action": "nothing",
             "destinationTargetName": "__error__"

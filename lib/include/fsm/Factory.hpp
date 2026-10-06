@@ -155,7 +155,7 @@ namespace fsm
                 idx + 1, model, buildNthTransition(model[idx], builder));
         }
 
-        auto buildCondition(const bool negated, const std::string& conditionName) const
+        std::function<bool(const BbT&)> buildCondition(const bool negated, const std::string& conditionName) const
         {
             if (!registeredConditions.contains(conditionName))
             {
@@ -182,7 +182,7 @@ namespace fsm
             return buildDestination(
                 transition.destinationTargetName,
                 builder.when(
-                    buildCondition(transition.negated, transition.conditionName));
+                    buildCondition(transition.negated, transition.conditionName)));
         }
 
         auto buildNthTransition(
@@ -192,7 +192,7 @@ namespace fsm
             return buildDestination(
                 transition.destinationTargetName,
                 builder.orWhen(
-                    buildCondition(transition.negated, transition.conditionName));
+                    buildCondition(transition.negated, transition.conditionName)));
         }
 
         auto buildDefaultDestination(
