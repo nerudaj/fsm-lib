@@ -113,10 +113,15 @@ static std::string getJsonWithNegatedCondition()
                     "negated": true,
                     "conditionName": "alwaysFalse",
                     "destinationTargetName": "__finish__"
+                },
+                {
+                    "negated": false,
+                    "conditionName": "alwaysTrue",
+                    "destinationTargetName": "__error__"
                 }
             ],
-            "action": "nothing",
-            "destinationTargetName": "__error__"
+            "actionName": "nothing",
+            "destinationTargetName": "Start"
         }
     }
 })";
