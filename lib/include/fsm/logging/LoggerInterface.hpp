@@ -39,8 +39,12 @@ namespace fsm
             {
                 logImplementation(Log {
                     .machineId = std::format("{:#x}", fsmId),
-                    .blackboardId = std::format(
-                        "{:#x}", reinterpret_cast<std::uintptr_t>(&blackboard)),
+                    .blackboardId =
+                        blackboard.__debugId.empty()
+                            ? std::format(
+                                  "{:#x}",
+                                  reinterpret_cast<std::uintptr_t>(&blackboard))
+                            : blackboard.__debugId,
                     .blackboardLog = std::format("{}", blackboard),
                     .message = message,
                     .currentStateName = currentStateName,
@@ -52,8 +56,12 @@ namespace fsm
             {
                 logImplementation(Log {
                     .machineId = std::format("{:#x}", fsmId),
-                    .blackboardId = std::format(
-                        "{:#x}", reinterpret_cast<std::uintptr_t>(&blackboard)),
+                    .blackboardId =
+                        blackboard.__debugId.empty()
+                            ? std::format(
+                                  "{:#x}",
+                                  reinterpret_cast<std::uintptr_t>(&blackboard))
+                            : blackboard.__debugId,
                     .blackboardLog = "",
                     .message = message,
                     .currentStateName = currentStateName,
