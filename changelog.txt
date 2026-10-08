@@ -4,6 +4,7 @@ fsm-lib v2.x.x changelog:
 	- This is a preparation for a Designer application
 	- Does not support submachines and customizable error machines at the moment
  - `fsm::Fsm` is now movable
+ - `Blackboard` can be assigned DebugId that gets printed by Logger
 
 fsm-cpp v2.1.1 changelog:
  - Release can now be included into your CMakeLists through `find_package`
