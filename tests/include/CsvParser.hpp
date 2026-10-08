@@ -50,3 +50,8 @@ static constexpr bool alwaysTrue(const Blackboard&) noexcept
 {
     return true;
 }
+
+static constexpr bool alwaysFalse(const Blackboard&) noexcept
+{
+    return false;
+}

@@ -155,40 +155,44 @@ namespace fsm
                 idx + 1, model, buildNthTransition(model[idx], builder));
         }
 
-        auto buildFirstTransition(
-            const fsm::detail::FactoryFsmTransitionModel& transition,
-            auto&& builder) const
+        std::function<bool(const BbT&)> buildCondition(const bool negated, const std::string& conditionName) const
         {
-            if (!registeredConditions.contains(transition.conditionName))
+            if (!registeredConditions.contains(conditionName))
             {
                 throw fsm::Error(std::format(
                     "Model is referencing condition called '{}', which was not "
                     "registered",
-                    transition.conditionName));
+                    conditionName));
             }
 
+            if (negated)
+            {
+                return [condition=registeredConditions.at(conditionName)] (const BbT& bb) {
+                    return !condition(bb);
+                };
+            }
+
+            return registeredConditions.at(conditionName);
+        }
+
+        auto buildFirstTransition(
+            const fsm::detail::FactoryFsmTransitionModel& transition,
+            auto&& builder) const
+        {
             return buildDestination(
                 transition.destinationTargetName,
                 builder.when(
-                    registeredConditions.at(transition.conditionName)));
+                    buildCondition(transition.negated, transition.conditionName)));
         }
 
         auto buildNthTransition(
             const fsm::detail::FactoryFsmTransitionModel& transition,
             auto&& builder) const
         {
-            if (!registeredConditions.contains(transition.conditionName))
-            {
-                throw fsm::Error(std::format(
-                    "Model is referencing condition called '{}', which was not "
-                    "registered",
-                    transition.conditionName));
-            }
-
             return buildDestination(
                 transition.destinationTargetName,
                 builder.orWhen(
-                    registeredConditions.at(transition.conditionName)));
+                    buildCondition(transition.negated, transition.conditionName)));
         }
 
         auto buildDefaultDestination(
