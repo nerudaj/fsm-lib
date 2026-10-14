@@ -21,6 +21,12 @@ namespace fsm
     {
         // 0u is guaranteed to be the entry point of the machine
         std::vector<size_t> __stateIdxs = { size_t {} };
+        std::string __debugId = "";
+
+        void SetDebugId(const std::string& id)
+        {
+            __debugId = id;
+        }
     };
 
     /**
@@ -46,16 +52,12 @@ namespace fsm
     template<class Callable, class BlackboardType>
     concept ConditionConcept =
         requires(Callable&& fn, const BlackboardType& bb) {
-            {
-                fn(bb)
-            } -> std::same_as<bool>;
+            { fn(bb) } -> std::same_as<bool>;
         } && BlackboardTypeConcept<BlackboardType>;
 
     template<class Callable, class BlackboardType>
     concept ActionConcept = requires(Callable&& fn, BlackboardType& bb) {
-        {
-            fn(bb)
-        } -> std::same_as<void>;
+        { fn(bb) } -> std::same_as<void>;
     } && BlackboardTypeConcept<BlackboardType>;
 
     namespace detail

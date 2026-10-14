@@ -50,4 +50,19 @@ TEST_CASE("[Logger]")
 
         REQUIRE(line == "MachineId,BlackboardId,BlackboardLog,Message,CurrentStateName,TargetStateName,Duration (us)");
     }
+
+    SECTION("Properly logs debug ID when available")
+    {
+        auto&& bb1 = Blackboard();
+        bb1.SetDebugId("TestDebugId");
+        auto&& bb2 = Blackboard();
+
+        logger.log(0, "CurrentState", bb1, "Message", "TargetState");
+        REQUIRE(loggerInstance.lastLogBlackboardId == "TestDebugId");
+
+        logger.log(0, "CurrentState", bb2, "Message", "TargetState");
+        REQUIRE(
+            loggerInstance.lastLogBlackboardId
+            == std::format("{:#x}", reinterpret_cast<std::uintptr_t>(&bb2)));
+    }
 }

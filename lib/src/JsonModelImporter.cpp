@@ -19,6 +19,9 @@ namespace fsm::detail
 
         j["conditionName"].get_to(model.conditionName);
         j["destinationTargetName"].get_to(model.destinationTargetName);
+
+        if (j.contains("negated"))
+            j["negated"].get_to(model.negated);
     }
 
     void from_json(const nlohmann::json& j, FactoryFsmStateModel& model)
