@@ -192,6 +192,6 @@ class DomHelper {
      */
     static closeModal(id) {
         // hide() doesn't work for whatever reason
-        new bootstrap.Modal(document.getElementById(id))._hideModal();
+        bootstrap.Modal.getInstance(document.getElementById(id))?.hide();
     }
 }
