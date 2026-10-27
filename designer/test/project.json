@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "manifest": {
+    "version": 1,
+    "actionNames": [
+      "doNothing",
+      "advanceChar",
+      "storeWord"
+    ],
+    "conditionNames": [
+      "isComma",
+      "isEof"
+    ]
+  },
+  "currentMachineId": "Main",
+  "machines": {
+    "Main": {
+      "entryStateId": "State1",
+      "states": {
+        "State1": {
+          "x": 100,
+          "y": 100,
+          "id": "State1",
+          "name": "a",
+          "transitions": [],
+          "actionName": "doNothing",
+          "destinationId": "State1"
+        }
+      }
+    }
+  },
+  "stateCounter": 1
+}

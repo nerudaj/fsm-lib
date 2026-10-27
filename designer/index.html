@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>FSM Designer</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <script type="text/javascript" src="js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="js/cytoscape.min.js"></script>
+    <script type="text/javascript" src="js/Sortable.min.js"></script>
+    <script type="text/javascript" src="js/dom.js"></script>
+    <script type="text/javascript" src="js/cytoscapeHelper.js"></script>
+    <script type="text/javascript" src="js/editStateModal.js"></script>
+    <script type="text/javascript" src="js/result.js"></script>
+    <script type="text/javascript" src="js/fail.js"></script>
+    <script type="text/javascript" src="js/programHistory.js"></script>
+    <script type="text/javascript" src="js/manifest.js"></script>
+    <script type="text/javascript" src="js/model.js"></script>
+    <script type="text/javascript" src="js/graphIR.js"></script>
+    <script type="text/javascript" src="js/program.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+</head>
+
+<body onload="main();">
+    <!-- TOP NAVBAR -->
+    <nav class="navbar navbar-expand-lg bg-body-secondary">
+        <div class="container-fluid">
+            <div class="navbar-brand">FSM Designer</div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <!-- FILE DROPDOWN -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            File
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><button class="dropdown-item" href="#" onclick="loadManifest()" disabled>Update
+                                    manifest</button>
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="loadModel()">Load project</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="saveModel()">Save project</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportModel()">Export project</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- EDIT DROPDOWN -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Edit
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="undo()">Undo</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="redo()">Redo</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- MISC -->
+                    <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal"
+                            data-bs-target="#createNodeModal">Add state</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- MAIN CONTENT -->
+            <main id="GraphParent">
+                <div id="Graph"></div>
+            </main>
+
+        </div>
+    </div>
+
+    <!-- WELCOME LOADER MODAL -->
+    <div class="modal fade" id="WelcomeModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="WelcomeModalLabel">Welcome</h5>
+                </div>
+                <div class="modal-body">
+                    <p>What do you want to do today?</p>
+                    <button type="button" class="btn btn-secondary" onclick="loadManifest()">Load manifest</button>
+                    <button type="button" class="btn btn-secondary" onclick="loadModel()">Load
+                        project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREATE STATE MODAL -->
+    <div class="modal fade" id="createNodeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createNodeModalLabel">State inspector</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createNodeForm" onsubmit="event.preventDefault(); addState(event);">
+                        <div class="mb-3">
+                            <label for="AddState_NameInput" class="form-label">State name</label>
+                            <input type="text" class="form-control" id="AddState_NameInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="AddState_ActionInput" class="form-label">Default action</label>
+                            <select class="form-select" id="AddState_ActionInput" required>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Add State</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT STATE MODAL -->
+    <div class="modal fade" id="stateInspectorModal" tabindex="-1" aria-labelledby="stateInspectorModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="stateInspectorModalLabel">State inspector</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="pt-1">
+                        <ul class="nav flex-column">
+
+                            <li>
+                                <!-- title moved to modal-header -->
+                                <div class="text-muted mb-2 d-none"></div>
+                            </li>
+
+                            <li class="mb-3">
+                                <label for="EditState_NameInput" class="form-label">State name</label>
+                                <input type="text" class="form-control" id="EditState_NameInput">
+                            </li>
+
+                            <li>
+                                <hr>
+                            </li>
+
+                            <li class="mb-2">
+                                <h6 class="mb-2">Transitions</h6>
+
+                                <ol class="list-group" id="EditState_TransitionList">
+                                </ol>
+                            </li>
+
+                            <li class="mt-2">
+                                <button class="btn btn-secondary w-100" onclick="addTransitionSelection();"
+                                    id="EditState_AddTransitionButton">+</button>
+                            </li>
+
+                            <li class="mt-3">
+                                <hr>
+                            </li>
+
+                            <li class="mb-2">
+                                <h6 class="mb-2">Default behavior</h6>
+                            </li>
+
+                            <li class="mb-3">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <label for="EditState_ActionSelect" class="form-label">Action</label>
+                                        <select class="form-select" id="EditState_ActionSelect">
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label for="EditState_DestinationSelect" class="form-label">Transition
+                                            to</label>
+                                        <select class="form-select" id="EditState_DestinationSelect">
+                                        </select>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="mt-3">
+                                <hr>
+                            </li>
+
+                            <li class="mb-3">
+                                <input type="radio" class="btn-check" name="EditState_StateKindRadio"
+                                    id="EditState_RadioStateKindEntry" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="EditState_RadioStateKindEntry">Entry
+                                    state</label>
+
+                                <input type="radio" class="btn-check" name="EditState_StateKindRadio"
+                                    id="EditState_RadioStateKindRegular" autocomplete="off" checked>
+                                <label class="btn btn-outline-secondary" for="EditState_RadioStateKindRegular">Regular
+                                    state</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                        onclick="applyChangesToState()">Apply</button>
+
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,95 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+body>.container-fluid {
+    flex: 1;
+    min-height: 0;
+}
+
+body>.container-fluid>.row {
+    height: 100%;
+}
+
+main {
+    display: flex;
+    min-height: 0;
+}
+
+main #Graph {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.my-col-5 {
+    width: 40%;
+}
+
+.my-col-2 {
+    width: 20%;
+}
+
+.hidden {
+    display: none;
+}
+
+#GraphParent {
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+/* Cytoscape graph styling.
+   These custom properties are the single source of truth for how nodes and
+   edges look; js/program.js reads them off #Graph via getComputedStyle and
+   feeds them to Cytoscape, which cannot consume a browser stylesheet itself. */
+#Graph {
+    --graph-node-shape: round-rectangle;
+    /* states are using colors from bootstrap */
+    --graph-node-background-color: var(--bs-secondary);
+    --graph-node-entry-background-color: var(--bs-primary);
+    --graph-node-accept-background-color: var(--bs-success);
+    --graph-node-reject-background-color: var(--bs-danger);
+    --graph-node-text-color: #fff;
+    --graph-node-text-valign: center;
+    --graph-node-text-halign: center;
+    --graph-node-text-wrap: wrap;
+    --graph-node-text-justification: center;
+    --graph-node-text-max-width: 200;
+    --graph-node-width: 200;
+    --graph-node-font-size: 10;
+
+    --graph-edge-width: 2;
+    --graph-edge-line-color: #64748b;
+    --graph-edge-target-arrow-color: #64748b;
+    --graph-edge-target-arrow-shape: triangle;
+    --graph-edge-curve-style: bezier;
+
+    --graph-edge-text-color: #1e293b;
+    --graph-edge-font-size: 9;
+    --graph-edge-text-rotation: autorotate;
+    --graph-edge-text-margin-y: -8;
+    --graph-edge-text-background-color: #f8fafc;
+    --graph-edge-text-background-opacity: 0.9;
+    --graph-edge-text-background-padding: 3;
+    --graph-edge-text-background-shape: round-rectangle;
+
+    --graph-loop-direction: 0deg;
+    --graph-loop-sweep: -90deg;
+    --graph-loop-size: 60;
+}
