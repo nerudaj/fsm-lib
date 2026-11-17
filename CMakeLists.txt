@@ -9,13 +9,13 @@ get_version_from_git (
 
 project ( fsm-lib VERSION "${GIT_PROJECT_VERSION}" LANGUAGES CXX )
 
-if ( BOOTSTRAP_CPM )
-	include ( "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM_0.43.2.cmake" )
-endif ()
-
 option ( BOOTSTRAP_CPM "Whether to download CPM" ON )
 option ( BUILD_TESTS "Build unit testing target" ${PROJECT_IS_TOP_LEVEL} )
 option ( BUILD_EXAMPLES "Build example targets" ${PROJECT_IS_TOP_LEVEL} )
+
+if ( BOOTSTRAP_CPM )
+	include ( "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM_0.43.2.cmake" )
+endif ()
 
 if (NOT PROJECT_IS_TOP_LEVEL )
 	message ( DEBUG "fsm-lib is used as a dependency, turning off unwanted features" )
