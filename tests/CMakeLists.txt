@@ -1,5 +1,3 @@
-cmake_minimum_required ( VERSION 3.26 )
-
 set ( TARGET tests )
 
 glob_headers_and_sources ( HEADERS SOURCES )
@@ -16,7 +14,7 @@ target_link_libraries ( ${TARGET}
 	fsm-lib
 )
 
-apply_compile_options ( ${TARGET} )
+apply_recommended_compile_options ( ${TARGET} )
 enable_autoformatter ( ${TARGET} )
 
 add_test (
