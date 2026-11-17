@@ -26,13 +26,13 @@ function ( bootstrap_cpm )
 
     cmake_parse_arguments( BOOTSTRAP_CPM "" "${oneValueArgs}" "" ${ARGN} )
 
-    set ( VERSION "latest" )
+    set ( GET_CPM_URL "https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake" )
     if ( BOOTSTRAP_CPM_VERSION )
-        set ( VERSION "${BOOTSTRAP_CPM_VERSION}" )
-    endif()
+        set ( GET_CPM_URL "https://github.com/cpm-cmake/CPM.cmake/releases/download/${BOOTSTRAP_CPM_VERSION}/get_cpm.cmake" )
+    endif ()
 
     file ( DOWNLOAD 
-        "https://github.com/cpm-cmake/CPM.cmake/releases/${VERSION}/download/get_cpm.cmake"
+        "${GET_CPM_URL}"
         "${CMAKE_CURRENT_BINARY_DIR}/get_cpm.cmake"
     )
 
@@ -49,32 +49,38 @@ endfunction ()
 function ( glob_headers_and_sources HEADERS_OUTVARNAME SOURCES_OUTVARNAME )
     file ( GLOB_RECURSE
         LOCAL_HEADERS
-        "${CMAKE_CURRENT_SOURCE_DIR}/include**/*.hpp"
+        CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
     )
 	
 	file ( GLOB_RECURSE
 		LOCAL_HEADERS2
-        "${CMAKE_CURRENT_SOURCE_DIR}/include**/*.h"
+        CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
 	)
     
     file ( GLOB_RECURSE
         PRIVATE_HEADERS
-        "${CMAKE_CURRENT_SOURCE_DIR}/private_include**/*.hpp"
+        CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/private_include/*.hpp"
     )
     
     file ( GLOB_RECURSE
         PRIVATE_HEADERS2
-        "${CMAKE_CURRENT_SOURCE_DIR}/private_include**/*.h"
+        CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/private_include/*.h"
     )
 
     file ( GLOB_RECURSE
         LOCAL_SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/src**/*.cpp"
+        CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
     )
     
     file ( GLOB_RECURSE
         LOCAL_SOURCES2
-        "${CMAKE_CURRENT_SOURCE_DIR}/source**/*.cpp"
+        CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp"
     )
 
     source_group(
@@ -104,6 +110,7 @@ endfunction ()
 # Additional Information:
 #   The version string is retrieved using the `git describe --tags` command, which extracts the latest annotated tag from the git history.
 #   The tags should follow the Semantic Versioning (semver) format, with an optional 'v' prefix. For example, 'v1.0.0' or '1.0.0'.
+#   Could can have an optional [-text] suffix after the version, such as v0.0.1-alpha7. Note it will be ignored.
 # Example:
 #   get_version_from_git(PROJECT_VERSION_VARIABLE my_project_version FULL_VERSION_VARIABLE my_full_version)
 function ( get_version_from_git )
@@ -120,7 +127,7 @@ function ( get_version_from_git )
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 
-    string ( REGEX MATCH "[0-9]+\.[0-9]+\.[0-9]+" LOCAL_CORE_VERSION "${LOCAL_STDOUT}" )
+    string ( REGEX MATCH "[0-9]+[.][0-9]+[.][0-9]+" LOCAL_CORE_VERSION "${LOCAL_STDOUT}" )
 
     message ( "Found full git version: ${LOCAL_STDOUT}" )
     message ( "Inferred project version: ${LOCAL_CORE_VERSION}" )
@@ -216,30 +223,18 @@ function ( fetch_headeronly_dependency DEPNAME )
     return ( PROPAGATE "${DEPNAME}_FOLDER" )
 endfunction ()
 
-function ( apply_compile_options TARGET )
-	if ( ${MSVC} )
-		target_compile_options ( ${TARGET}
-			PRIVATE
-			/W4
-			/MP
-			/we4265 # Missing virtual dtor
-			/we4834 # Discarding result of [[nodiscard]] function
-			/we4456 # Name shadowing
-			/we4457 # Name shadowing
-			/we4458 # Name shadowing
-			/we4459 # Name shadowing
-			# /wd4251
-			/we4369 # value of enum overflows underlying type
-			/we5205 # Dtor on iface is not virtual
-		)
-		
+function ( apply_recommended_compile_options TARGET )
+    target_compile_options ( ${TARGET}
+        PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/W4 /MP /we4265 /we4834 /we4456 /we4457 /we4458 /we4459 /we4369 /we5205>
+        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall -Wextra -Wpedantic -Werror=shadow -Werror=non-virtual-dtor>
+    )
+
+    if ( ${MSVC} )
 		set_target_properties(
 			${TARGET} PROPERTIES
 			DEBUG_POSTFIX "-d"
-		)
-		
-	else ()
-		message ( "apply_compile_options: no options for non-msvc compiler" )
+		)	
 	endif ()
 endfunction ()
 
@@ -312,7 +307,7 @@ macro ( make_static_library TARGET )
     endif ()
 
     enable_autoformatter ( ${TARGET} )
-    apply_compile_options ( ${TARGET} )
+    apply_recommended_compile_options ( ${TARGET} )
 endmacro()
 
 macro ( make_executable TARGET )
@@ -329,7 +324,7 @@ macro ( make_executable TARGET )
     link_private_header_folder ( ${TARGET} )
 
     if ( CIME_DEPS )
-        target_link_libraries ( ${TARGET} PUBLIC ${CIME_DEPS} )
+        target_link_libraries ( ${TARGET} PRIVATE ${CIME_DEPS} )
     endif ()
 
     if ( CIME_ENABLE_LINTER )
@@ -337,7 +332,7 @@ macro ( make_executable TARGET )
     endif ()
 
     enable_autoformatter ( ${TARGET} )
-    apply_compile_options ( ${TARGET} )
+    apply_recommended_compile_options ( ${TARGET} )
 endmacro()
 
 ### === BOOTSTRAPPING === ###
