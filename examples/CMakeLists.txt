@@ -9,28 +9,28 @@ target_link_libraries ( ${TARGET}
 	INTERFACE fsm-lib
 )
 
-function ( execute_example_as_test TARGET )
+function ( execute_example_as_test TARGET_NAME )
 	if ( BUILD_TESTS )
 		add_test (
-			NAME "${TARGET}"
-			COMMAND "${TARGET}"
+			NAME "${TARGET_NAME}"
+			COMMAND "${TARGET_NAME}"
 		)
 	endif ()
 endfunction ()
 
-macro ( fsm_lib_add_example TARGET )
-	add_executable ( ${TARGET}
+function ( fsm_lib_add_example TARGET_NAME )
+	add_executable ( ${TARGET_NAME}
 		"${CMAKE_CURRENT_SOURCE_DIR}/Main.cpp"
 	)
 
-	target_link_libraries ( ${TARGET} examples-common )
+	target_link_libraries ( ${TARGET_NAME} examples-common )
 
-	apply_recommended_compile_options ( ${TARGET} )
-	enable_autoformatter ( ${TARGET} )
-	execute_example_as_test ( ${TARGET} )
+	apply_recommended_compile_options ( ${TARGET_NAME} )
+	enable_autoformatter ( ${TARGET_NAME} )
+	execute_example_as_test ( ${TARGET_NAME} )
 
-	set_target_properties( ${TARGET} PROPERTIES FOLDER "examples" )
-endmacro ()
+	set_target_properties( ${TARGET_NAME} PROPERTIES FOLDER "examples" )
+endfunction ()
 
 add_subdirectory ( "${CMAKE_CURRENT_SOURCE_DIR}/01-loggable-blackboard" )
 add_subdirectory ( "${CMAKE_CURRENT_SOURCE_DIR}/02-simple-fsm" )
