@@ -18,7 +18,7 @@ function ( execute_example_as_test TARGET )
 	endif ()
 endfunction ()
 
-macro ( fsm_lib_add_example NAME )
+macro ( fsm_lib_add_example TARGET )
 	add_executable ( ${TARGET}
 		"${CMAKE_CURRENT_SOURCE_DIR}/Main.cpp"
 	)
