@@ -10,7 +10,6 @@ struct [[nodiscard]] ManifestSchema final
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ManifestSchema, version, actions, conditions);
 
-// cppcheck-suppress uninitMemberVar
 fsm::JsonManifestExporter::JsonManifestExporter(std::ostream& os) noexcept
     : os(os)
 {}

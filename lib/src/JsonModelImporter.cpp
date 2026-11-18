@@ -60,7 +60,6 @@ void from_json(const nlohmann::json& j, fsm::detail::FactoryFsmModel& model)
     j["states"].get_to(model.states);
 }
 
-// cppcheck-suppress uninitMemberVar
 fsm::JsonModelImporter::JsonModelImporter(std::istream& is) noexcept : is(is) {}
 
 std::expected<fsm::detail::FactoryFsmModel, fsm::Error>
