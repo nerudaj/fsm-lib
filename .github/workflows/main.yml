@@ -1,4 +1,4 @@
-name: CI-MSVC-Windows
+name: CI-Windows-MSVC
 
 on:
   push:
@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
-
-env:
-  BUILD_DIR: ${{github.workspace}}/vsbuild
 
 jobs:
   build:
@@ -20,28 +17,22 @@ jobs:
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v2
       with:
-        cmake-version: '3.26.1'
+        cmake-version: '4.0.3'
 
     - name: Check cmake version
       run: cmake --version
 
     - name: Configure CMake
       run: |
-        mkdir "${{env.BUILD_DIR}}"
-        cd "${{env.BUILD_DIR}}"
-        cmake ..
+        cmake --preset msvc-2022
       shell: cmd
 
     - name: Build
-      working-directory: ${{env.BUILD_DIR}}
       run: |
-        cmake --build . --config Debug
-        cmake --build . --config Release
+        cmake --build --preset msvc-2022 --config Debug
       shell: cmd
 
     - name: Test
-      working-directory: ${{env.BUILD_DIR}}
       run: |
-        ctest -C Debug
-        ctest -C Release
+        ctest --preset msvc-2022 -C Debug
       shell: cmd

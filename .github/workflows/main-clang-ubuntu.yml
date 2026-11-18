@@ -1,0 +1,56 @@
+name: CI-Ubuntu-Ninja-Clang
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    strategy:
+        matrix:
+          clang: [18, 20, 21]
+    env:
+      CLANG_SUFFIX: -${{ matrix.clang }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '4.0.3'
+    
+    - name: Install Clang ${{ matrix.clang }}
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh ${{ matrix.clang }}
+      shell: bash
+
+    - name: Setup SFML development libraries
+      run: |
+        sudo apt update
+        sudo bash install_ubuntu_deps.sh ${{ matrix.clang }}
+      shell: bash
+
+    - name: Check cmake version
+      run: cmake --version
+
+    - name: Configure CMake
+      run: |
+        cmake --preset clang
+      shell: bash
+
+    - name: Build
+      run: |
+        cmake --build --preset clang --config Debug
+      shell: bash
+
+    - name: Test
+      run: |
+        ctest --preset clang -C Debug
+      shell: bash

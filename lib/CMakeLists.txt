@@ -1,5 +1,3 @@
-cmake_minimum_required ( VERSION 3.26 )
-
 set ( TARGET fsm-lib )
 
 make_static_library ( ${TARGET} )
@@ -10,6 +8,8 @@ if ( "${CMAKE_SYSTEM_NAME}" STREQUAL "Android" )
         PUBLIC android log
     )
 endif()
+
+target_compile_features( ${TARGET} PUBLIC cxx_std_23 )
 
 if ( NOT "${PROJECT_VERSION}" STREQUAL "" )
     install (

@@ -1,4 +1,4 @@
-name: CI-Ninja-Clang
+name: CI-Windows-Ninja-Clang
 
 on:
   push:
@@ -7,15 +7,9 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
-env:
-  BUILD_DIR: ${{github.workspace}}/vsbuild
-
 jobs:
   build:
-    strategy:
-      matrix:
-        platform: [windows-2022, ubuntu-latest]
-    runs-on: ${{ matrix.platform }}
+    runs-on: windows-2022
 
     steps:
     - uses: actions/checkout@v4
@@ -23,37 +17,23 @@ jobs:
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v2
       with:
-        cmake-version: '3.26.1'
-
-    - name: Install dependencies
-      if: matrix.platform == 'ubuntu-latest'
-      run: |
-        sudo apt update
-        sudo apt install libc++-dev
+        cmake-version: '4.0.3'
 
     - name: Check cmake version
       run: cmake --version
+      shell: cmd
 
-    - name: Configure CMake (windows)
-      if: matrix.platform == 'windows-2022'
+    - name: Configure CMake
       run: |
-        mkdir "${{env.BUILD_DIR}}"
-        cd "${{env.BUILD_DIR}}"
-        cmake -G Ninja -D CMAKE_CXX_COMPILER=clang++ ..
-
-    - name: Configure CMake (ubuntu)
-      if: matrix.platform == 'ubuntu-latest'
-      run: |
-        mkdir "${{env.BUILD_DIR}}"
-        cd "${{env.BUILD_DIR}}"
-        cmake -G Ninja -D CMAKE_CXX_COMPILER=clang++-18 -D CMAKE_CXX_FLAGS="-stdlib=libc++" ..
+        cmake --preset clang
+      shell: cmd
 
     - name: Build
-      working-directory: ${{env.BUILD_DIR}}
       run: |
-        cmake --build .
+        cmake --build --preset clang --config Debug
+      shell: cmd
 
     - name: Test
-      working-directory: ${{env.BUILD_DIR}}
       run: |
-        ctest --output-on-failure
+        ctest --preset clang -C Debug
+      shell: cmd
