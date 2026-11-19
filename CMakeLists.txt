@@ -9,11 +9,11 @@ get_version_from_git (
 
 project ( fsm-lib VERSION "${GIT_PROJECT_VERSION}" LANGUAGES CXX )
 
-option ( BOOTSTRAP_CPM "Whether to download CPM" ON )
-option ( BUILD_TESTS "Build unit testing target" ${PROJECT_IS_TOP_LEVEL} )
-option ( BUILD_EXAMPLES "Build example targets" ${PROJECT_IS_TOP_LEVEL} )
+option ( FSM_BOOTSTRAP_CPM "Whether to download CPM" ON )
+option ( FSM_BUILD_TESTS "Build unit testing target" ${PROJECT_IS_TOP_LEVEL} )
+option ( FSM_BUILD_EXAMPLES "Build example targets" ${PROJECT_IS_TOP_LEVEL} )
 
-if ( BOOTSTRAP_CPM )
+if ( FSM_BOOTSTRAP_CPM )
 	include ( "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM_0.43.2.cmake" )
 endif ()
 
@@ -26,12 +26,12 @@ CPMAddPackage ("gh:nlohmann/json@3.12.0")
 add_subdirectory ( "${PROJECT_SOURCE_DIR}/lib" )
 add_library ( fsm::fsm-lib ALIAS fsm-lib )
 
-if ( BUILD_TESTS )
+if ( FSM_BUILD_TESTS )
 	enable_testing()
 	add_subdirectory ( "${PROJECT_SOURCE_DIR}/tests" )
 endif ()
 
-if ( BUILD_EXAMPLES )
+if ( FSM_BUILD_EXAMPLES )
 	add_subdirectory ( "${PROJECT_SOURCE_DIR}/examples" )
 endif ()
 

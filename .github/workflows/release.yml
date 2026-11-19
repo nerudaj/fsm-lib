@@ -28,7 +28,7 @@ jobs:
       run: |
         mkdir "${{github.workspace}}/Debug"
         cd "${{github.workspace}}/Debug"
-        cmake .. -D BUILD_TESTS=OFF BUILD_EXAMPLES=OFF
+        cmake .. -D FSM_BUILD_TESTS=OFF FSM_BUILD_EXAMPLES=OFF
         cmake --build . --config Debug
         cpack -C Debug
     
@@ -36,7 +36,7 @@ jobs:
       run: |
         mkdir "${{github.workspace}}/Release"
         cd "${{github.workspace}}/Release"
-        cmake .. -D BUILD_TESTS=OFF BUILD_EXAMPLES=OFF
+        cmake .. -D FSM_BUILD_TESTS=OFF FSM_BUILD_EXAMPLES=OFF
         cmake --build . --config Release
         cpack -C Release
 

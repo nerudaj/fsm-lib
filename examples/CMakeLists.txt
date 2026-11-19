@@ -10,7 +10,7 @@ target_link_libraries ( ${TARGET}
 )
 
 function ( execute_example_as_test TARGET_NAME )
-	if ( BUILD_TESTS )
+	if ( FSM_BUILD_TESTS )
 		add_test (
 			NAME "${TARGET_NAME}"
 			COMMAND "${TARGET_NAME}"
